@@ -7,6 +7,7 @@ public partial class NewScript : Node
 	private Weapon weaponTest ;
 	private SlotGridUI buyMenu;
 	private LoadoutUI loadoutUI;
+	private CrosshairSetting crosshairSetting;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -17,6 +18,11 @@ public partial class NewScript : Node
 		if (loadoutUI == null)
 		{
 			GD.PushError("未找到 LoadoutUI 节点（脚本可能未挂载）");
+		}
+		crosshairSetting = GetNodeOrNull<CrosshairSetting>("HUD/CrosshairSetting");
+		if (crosshairSetting == null)
+		{
+			GD.PushError("未找到 CrosshairSetting 节点（准星设置界面）");
 		}
 		chara.WeaponController.AddWeapon("AR15");
 	}
@@ -66,6 +72,13 @@ public partial class NewScript : Node
 			if (loadoutUI != null)
 			{
 				loadoutUI.Visible = !loadoutUI.Visible;
+			}
+		}
+		if (@event.IsActionPressed("OpenCrosshairSetting"))
+		{
+			if (crosshairSetting != null)
+			{
+				crosshairSetting.Visible = !crosshairSetting.Visible;
 			}
 		}
 	}

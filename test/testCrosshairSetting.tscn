@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://c2q8n04wv1hpd"]
+
+[ext_resource type="PackedScene" uid="uid://c4m7wq1d0yah2" path="res://scenes/UI/Crosshair.tscn" id="1_crosshair"]
+[ext_resource type="PackedScene" uid="uid://c7n3qb2wz9hvd" path="res://scenes/UI/CrosshairSetting.tscn" id="2_setting"]
+
+[node name="TestCrosshairSetting" type="Node2D" unique_id=741258963]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=852369741]
+
+[node name="Crosshair" parent="HUD" unique_id=963258741 instance=ExtResource("1_crosshair")]
+
+[node name="CrosshairSetting" parent="HUD" unique_id=147258369 instance=ExtResource("2_setting")]

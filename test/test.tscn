@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://blbpjqqpuc58p" path="res://scenes/UI/LoadoutUI.tscn" id="6_loadout"]
 [ext_resource type="PackedScene" uid="uid://dl617vlgxxp4x" path="res://scenes/characters/interface/CharacterBaseScene.tscn" id="6_s3n3v"]
 [ext_resource type="Script" uid="uid://c5n8j2k7m1q4t" path="res://test/WeaponInputUI.cs" id="7_winput"]
+[ext_resource type="PackedScene" uid="uid://c4m7wq1d0yah2" path="res://scenes/UI/Crosshair.tscn" id="8_crosshair"]
+[ext_resource type="PackedScene" uid="uid://c7n3qb2wz9hvd" path="res://scenes/UI/CrosshairSetting.tscn" id="9_crosshairsetting"]
 
 [node name="Test" type="Node2D" unique_id=1382898581]
 script = ExtResource("1_8a8pi")
@@ -34,3 +36,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_winput")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=918273645]
+
+[node name="Crosshair" parent="HUD" unique_id=819273654 instance=ExtResource("8_crosshair")]
+
+[node name="CrosshairSetting" parent="HUD" unique_id=147258369 instance=ExtResource("9_crosshairsetting")]
+visible = false

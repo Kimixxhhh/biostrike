@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c7n3qb2w1ahvd"]
+
+[ext_resource type="Script" uid="uid://cy7b3nq5wz1hv" path="res://scenes/UI/CrosshairSetting.cs" id="1_crosshairsetting"]
+
+[node name="CrosshairSetting" type="Control" unique_id=561237984]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_crosshairsetting")
