@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dpksbpkhkpht3"]
+
+[ext_resource type="Script" uid="uid://b3rvkjeyvkbd7" path="res://scenes/components/ReloadController.cs" id="1_psfr8"]
+
+[node name="ReloadController" type="Node" unique_id=193252451]
+script = ExtResource("1_psfr8")
+
+[node name="Timer" type="Timer" parent="." unique_id=844917193]
+unique_name_in_owner = true
+one_shot = true

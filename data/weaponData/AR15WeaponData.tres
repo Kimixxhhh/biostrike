@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://dgq36f3w3wxfn"]
+
+[ext_resource type="PackedScene" uid="uid://blbdvfpkjty5r" path="res://scenes/bullets/Bullet.tscn" id="1_apq6f"]
+[ext_resource type="Script" uid="uid://db754w076ae3x" path="res://data/WeaponData.cs" id="1_ia5o3"]
+[ext_resource type="Texture2D" uid="uid://bpsbnfm50njaf" path="res://assets/weapon/range/AR15.png" id="2_86sfm"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3mkhq"]
+atlas = ExtResource("2_86sfm")
+
+[resource]
+script = ExtResource("1_ia5o3")
+WeaponName = "AR-15"
+WeaponId = "AR15"
+WeaponIcon = SubResource("AtlasTexture_3mkhq")
+Damage = 25.0
+BulletSpeed = 400.0
+BulletScene = ExtResource("1_apq6f")
+Price = 1500
+Overheat = 1.0
+Cooldown = 0.11
+Spread = 10.0
+SpreadMin = 2.0
+SpreadIncrease = 1.0
+SpreadDecrease = 20.0
+MagazineRounds = 30
+TotalRounds = 300
+ReloadTime = 2.0
+SwitchTime = 0.5
+RotationInertia = 50.0
+MoveInertia = 1.0
+BulletImpact = 200.0
+metadata/_custom_type_script = "uid://db754w076ae3x"

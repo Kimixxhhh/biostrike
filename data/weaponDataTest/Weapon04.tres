@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" uid="uid://db754w076ae3x" path="res://data/WeaponData.cs" id="1_w"]
+[ext_resource type="Texture2D" uid="uid://idmtep1246pr" path="res://assets/weapon/range/Glock.png" id="2_ic"]
+
+[resource]
+script = ExtResource("1_w")
+WeaponName = "Weapon 04"
+WeaponIcon = ExtResource("2_ic")
+Price = 400

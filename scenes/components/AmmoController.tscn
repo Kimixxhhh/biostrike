@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://i6v33n4p5v07"]
+
+[ext_resource type="Script" uid="uid://girnbwv1ncr7" path="res://scenes/components/AmmoController.cs" id="1_qh0oh"]
+
+[node name="AmmoController" type="Node" unique_id=180153848]
+script = ExtResource("1_qh0oh")

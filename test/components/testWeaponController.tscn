@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://lvlx10djb6qf"]
+
+[ext_resource type="Script" uid="uid://b36bs0ho5lyeb" path="res://test/components/TestWeaponController.cs" id="1_gsxsj"]
+[ext_resource type="PackedScene" uid="uid://bml2d6holgpnh" path="res://scenes/weapon/AR15WeaponScene.tscn" id="2_spt8a"]
+
+[node name="TestWeaponController" type="Node2D" unique_id=1341282172]
+script = ExtResource("1_gsxsj")
+
+[node name="WeaponSceneBase" parent="." unique_id=1984182305 instance=ExtResource("2_spt8a")]
+unique_name_in_owner = true

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bml2d6holgpnh"]
+
+[ext_resource type="PackedScene" uid="uid://dl5net6wvy87t" path="res://scenes/interface/WeaponSceneBase.tscn" id="1_lrw6a"]
+[ext_resource type="PackedScene" uid="uid://c6l2cic8gsiq2" path="res://scenes/weaponAnime/AR15WeaponAnimeScene.tscn" id="2_10qv0"]
+[ext_resource type="Script" uid="uid://c7p3h1dekvkut" path="res://scenes/weapon/AR15WeaponScene.cs" id="2_ds74d"]
+[ext_resource type="Resource" uid="uid://dgq36f3w3wxfn" path="res://data/weaponData/AR15WeaponData.tres" id="3_7twoq"]
+[ext_resource type="PackedScene" uid="uid://dpksbpkhkpht3" path="res://scenes/components/ReloadController.tscn" id="6_ex2k8"]
+[ext_resource type="PackedScene" uid="uid://ln006olpgfy2" path="res://scenes/components/WeaponRangeStatusController.tscn" id="7_g6e0k"]
+[ext_resource type="PackedScene" uid="uid://i6v33n4p5v07" path="res://scenes/components/AmmoController.tscn" id="7_k50rk"]
+[ext_resource type="PackedScene" uid="uid://cx4tk3n8wcptn" path="res://scenes/components/FireAutoController.tscn" id="8_k50rk"]
+[ext_resource type="PackedScene" uid="uid://ov5moiu0m34m" path="res://scenes/components/ButtstockAttackController.tscn" id="9_3urdh"]
+
+[node name="WeaponSceneBase" unique_id=1984182305 instance=ExtResource("1_lrw6a")]
+script = ExtResource("2_ds74d")
+weaponData = ExtResource("3_7twoq")
+
+[node name="WeaponAnimeScene" parent="Pivot" parent_id_path=PackedInt32Array(1749831632) index="1" unique_id=427498151 instance=ExtResource("2_10qv0")]
+unique_name_in_owner = true
+
+[node name="SelectionController" parent="." index="1" unique_id=839982818]
+unique_name_in_owner = true
+
+[node name="ReloadController" parent="." index="2" unique_id=193252451 instance=ExtResource("6_ex2k8")]
+unique_name_in_owner = true
+
+[node name="WeaponRangeStatusController" parent="." index="3" unique_id=2076641985 instance=ExtResource("7_g6e0k")]
+unique_name_in_owner = true
+
+[node name="AmmoController" parent="." index="4" unique_id=180153848 instance=ExtResource("7_k50rk")]
+unique_name_in_owner = true
+
+[node name="FireAutoController" parent="." index="5" unique_id=1143336449 instance=ExtResource("8_k50rk")]
+unique_name_in_owner = true
+
+[node name="ButtstockAttackController" parent="." index="6" unique_id=1001152982 instance=ExtResource("9_3urdh")]
+unique_name_in_owner = true

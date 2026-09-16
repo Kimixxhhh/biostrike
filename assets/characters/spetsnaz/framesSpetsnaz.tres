@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bamhrn0gbpvmq"]
+
+[ext_resource type="Texture2D" uid="uid://bm07ma60ir4g8" path="res://assets/characters/spetsnaz/Spetsnaz_idle.png" id="1_mgpt6"]
+[ext_resource type="Texture2D" uid="uid://csyx88p5a83bq" path="res://assets/characters/spetsnaz/Spetsnaz_walk_1.png" id="2_bufqr"]
+[ext_resource type="Texture2D" uid="uid://026ioliy8b37" path="res://assets/characters/spetsnaz/Spetsnaz_walk_2.png" id="3_fpuam"]
+[ext_resource type="Texture2D" uid="uid://uvhwhyn0a8qy" path="res://assets/characters/spetsnaz/Spetsnaz_walk_3.png" id="4_tb4yb"]
+[ext_resource type="Texture2D" uid="uid://ctos7uy80frmp" path="res://assets/characters/spetsnaz/Spetsnaz_walk_4.png" id="5_s3ht8"]
+[ext_resource type="Texture2D" uid="uid://cjdlqd3ncdes6" path="res://assets/characters/spetsnaz/Spetsnaz_walk_5.png" id="6_18l0c"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_mgpt6")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_bufqr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_fpuam")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_tb4yb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_s3ht8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_18l0c")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 10.0
+}]

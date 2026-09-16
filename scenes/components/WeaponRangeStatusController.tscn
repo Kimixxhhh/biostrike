@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ln006olpgfy2"]
+
+[ext_resource type="Script" uid="uid://chyqq8b88pra0" path="res://scenes/components/WeaponRangeStatusController.cs" id="1_jf4ws"]
+
+[node name="WeaponRangeStatusController" type="Node" unique_id=2076641985]
+script = ExtResource("1_jf4ws")

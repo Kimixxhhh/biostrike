@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bob0ll2n08ixn"]
+
+[ext_resource type="PackedScene" uid="uid://dacpqro6ngsav" path="res://scenes/characters/charaComponents/CharaAnimeZombie.tscn" id="1_c61o5"]
+[ext_resource type="Script" uid="uid://qf610aio2lxi" path="res://scenes/characters/interface/CharacterBaseScene.cs" id="1_lxeqs"]
+[ext_resource type="PackedScene" uid="uid://dipsm7myws7oq" path="res://scenes/characters/components/WeaponController.tscn" id="3_rnoyb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
+radius = 20.0
+
+[node name="ZombieBaseScene" type="CharacterBody2D" unique_id=311178127]
+script = ExtResource("1_lxeqs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1638023972]
+shape = SubResource("CircleShape2D_3owqy")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1154867467]
+scale = Vector2(2.5, 2.5)
+
+[node name="CharaAnimeZombie" parent="Visual" unique_id=197952786 instance=ExtResource("1_c61o5")]
+
+[node name="WeaponController" parent="." unique_id=1089269761 instance=ExtResource("3_rnoyb")]

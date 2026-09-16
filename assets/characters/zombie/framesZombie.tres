@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bd137thq5w8as"]
+
+[ext_resource type="Texture2D" uid="uid://cau1apiena43o" path="res://assets/characters/zombie/zombie_idle.png" id="1_glloj"]
+[ext_resource type="Texture2D" uid="uid://kqkf54vafyqg" path="res://assets/characters/zombie/zombie_walk_1.png" id="2_53khk"]
+[ext_resource type="Texture2D" uid="uid://1xg1a74aqih6" path="res://assets/characters/zombie/zombie_walk_2.png" id="3_b6goe"]
+[ext_resource type="Texture2D" uid="uid://cykmg24kr067w" path="res://assets/characters/zombie/zombie_walk_3.png" id="4_mwi4q"]
+[ext_resource type="Texture2D" uid="uid://brdrp843cdsk2" path="res://assets/characters/zombie/zombie_walk_4.png" id="5_5jjvl"]
+[ext_resource type="Texture2D" uid="uid://bebmcyr8621yx" path="res://assets/characters/zombie/zombie_walk_5.png" id="6_b7n31"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_glloj")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_53khk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_b6goe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_mwi4q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_5jjvl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_b7n31")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 10.0
+}]

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bydgev70imx2j"]
+
+[ext_resource type="PackedScene" uid="uid://dl5net6wvy87t" path="res://scenes/interface/WeaponSceneBase.tscn" id="1_snt2b"]
+[ext_resource type="PackedScene" uid="uid://ck766evy5ej7s" path="res://scenes/weaponAnime/HelixMkIWeaponAnimeScene.tscn" id="2_lmpqw"]
+
+[node name="WeaponSceneBase" unique_id=1984182305 instance=ExtResource("1_snt2b")]
+
+[node name="WeaponAnimeScene" parent="Pivot" parent_id_path=PackedInt32Array(1749831632) index="1" unique_id=427498151 instance=ExtResource("2_lmpqw")]

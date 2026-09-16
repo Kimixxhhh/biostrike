@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d321o3tmhspvd"]
+
+[ext_resource type="Script" uid="uid://do3an70tp2rkp" path="res://scenes/components/UtilityFireController.cs" id="1_gsf88"]
+
+[node name="UtilityFireController" type="Node" unique_id=1156094553]
+script = ExtResource("1_gsf88")

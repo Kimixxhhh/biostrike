@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://bgikupo4xwag5"]
+
+[ext_resource type="PackedScene" uid="uid://by0yhr7k46to1" path="res://scenes/interface/WeaponAnimeScene.tscn" id="1_7knd6"]
+[ext_resource type="Texture2D" uid="uid://cwgas3t28mmgw" path="res://assets/weapon/utility/M62.png" id="2_55hs1"]
+[ext_resource type="Script" uid="uid://cvqr2jdqydsct" path="res://scenes/weaponAnime/M67WeaponAnimeScene.cs" id="2_phmj6"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10c6r"]
+atlas = ExtResource("2_55hs1")
+region = Rect2(0, 7.8733826, 9.084675, 9.126617)
+
+[sub_resource type="Animation" id="Animation_55hs1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset/Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(6, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/xoffset/Body:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_5lloe"]
+resource_name = "reload"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset/Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.72999996, 0.97),
+"transitions": PackedFloat32Array(1, 0.3298771, 2.219139, 1),
+"update": 0,
+"values": [Vector2(6, 0), Vector2(6, 0), Vector2(6, -15), Vector2(6, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.48, 0.96),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 6.283185307179586]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/xoffset/Body:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.42, 0.47, 0.98999995),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_phmj6"]
+resource_name = "switch"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset/Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.24, 0.5),
+"transitions": PackedFloat32Array(0.37892944, 1.8660665, 1),
+"update": 0,
+"values": [Vector2(6, 0), Vector2(6, -15), Vector2(6, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.283185307179586]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5lloe"]
+_data = {
+&"RESET": SubResource("Animation_55hs1"),
+&"reload": SubResource("Animation_5lloe"),
+&"switch": SubResource("Animation_phmj6")
+}
+
+[node name="WeaponAnimeScene" unique_id=427498151 instance=ExtResource("1_7knd6")]
+scale = Vector2(2, 2)
+script = ExtResource("2_phmj6")
+
+[node name="Body" parent="Pivot/xoffset" parent_id_path=PackedInt32Array(2146708407) index="2" unique_id=1296419746]
+position = Vector2(6, 0)
+texture = SubResource("AtlasTexture_10c6r")
+
+[node name="AnimationPlayer" parent="." index="1" unique_id=282601806]
+libraries/ = SubResource("AnimationLibrary_5lloe")

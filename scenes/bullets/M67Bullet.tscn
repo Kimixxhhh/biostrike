@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dv2x7gi82xy5p"]
+
+[ext_resource type="PackedScene" uid="uid://blbdvfpkjty5r" path="res://scenes/bullets/Bullet.tscn" id="1_6abbv"]
+[ext_resource type="Script" uid="uid://cqnyyl5mslmjm" path="res://scenes/bullets/M67Bullet.cs" id="2_bu41a"]
+[ext_resource type="Texture2D" uid="uid://cwgas3t28mmgw" path="res://assets/weapon/utility/M62.png" id="3_ocswp"]
+[ext_resource type="PackedScene" uid="uid://wfheeebehcbv" path="res://scenes/bulletComponents/ExplosionComponent.tscn" id="4_ptv30"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_acjwd"]
+atlas = ExtResource("3_ocswp")
+region = Rect2(0, 7.7550926, 9, 9.244907)
+
+[sub_resource type="Animation" id="Animation_ptv30"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_ocswp"]
+resource_name = "spin"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.48),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.283185307179586]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ptv30"]
+_data = {
+&"RESET": SubResource("Animation_ptv30"),
+&"spin": SubResource("Animation_ocswp")
+}
+
+[node name="Bullet" unique_id=1102892245 instance=ExtResource("1_6abbv")]
+script = ExtResource("2_bu41a")
+
+[node name="Sprite2D" parent="." index="0" unique_id=1956611499]
+scale = Vector2(2, 2)
+texture = SubResource("AtlasTexture_acjwd")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="2" unique_id=239069282]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_ptv30")
+
+[node name="ExplosionComponent" parent="." index="3" unique_id=1224852985 instance=ExtResource("4_ptv30")]

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://ce0u2ut4a2kx7"]
+
+[ext_resource type="Script" uid="uid://bqnohokc6kodu" path="res://test/NewScript.cs" id="1_8a8pi"]
+[ext_resource type="PackedScene" uid="uid://b8n4r6k1eap30" path="res://scenes/UI/SlotGridUI.tscn" id="5_buymenu"]
+[ext_resource type="PackedScene" uid="uid://d01sum58prkte" path="res://test/components/bulletslowdowntest.tscn" id="5_s3n3v"]
+[ext_resource type="PackedScene" uid="uid://bob0ll2n08ixn" path="res://scenes/characters/interface/ZombieBaseScene.tscn" id="5_tbfq4"]
+[ext_resource type="PackedScene" uid="uid://blbpjqqpuc58p" path="res://scenes/UI/LoadoutUI.tscn" id="6_loadout"]
+[ext_resource type="PackedScene" uid="uid://dl617vlgxxp4x" path="res://scenes/characters/interface/CharacterBaseScene.tscn" id="6_s3n3v"]
+[ext_resource type="Script" uid="uid://c5n8j2k7m1q4t" path="res://test/WeaponInputUI.cs" id="7_winput"]
+
+[node name="Test" type="Node2D" unique_id=1382898581]
+script = ExtResource("1_8a8pi")
+
+[node name="SlotGridUI" parent="." unique_id=378294561 instance=ExtResource("5_buymenu")]
+visible = false
+
+[node name="LoadoutUI" parent="." unique_id=339120478 instance=ExtResource("6_loadout")]
+visible = false
+
+[node name="ZombieBaseScene" parent="." unique_id=311178127 instance=ExtResource("5_tbfq4")]
+position = Vector2(73, 89)
+
+[node name="Bulletslowdowntest" parent="." unique_id=12314198 instance=ExtResource("5_s3n3v")]
+position = Vector2(24, 40)
+
+[node name="CharacterBaseScene" parent="." unique_id=387289560 instance=ExtResource("6_s3n3v")]
+unique_name_in_owner = true
+position = Vector2(143, 171)
+
+[node name="WeaponInputUI" type="Control" parent="." unique_id=472938156]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_winput")

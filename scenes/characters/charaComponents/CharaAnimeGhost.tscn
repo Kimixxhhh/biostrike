@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://tqku127pdo47"]
+
+[ext_resource type="SpriteFrames" uid="uid://ednw1fnmbfaj" path="res://assets/characters/framesGhost.tres" id="1_kgiml"]
+
+[node name="CharaAnimeGhost" type="AnimatedSprite2D" unique_id=742280100]
+sprite_frames = ExtResource("1_kgiml")

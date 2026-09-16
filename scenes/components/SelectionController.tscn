@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ba4e0eculdwt1"]
+
+[ext_resource type="Script" uid="uid://b7e0je5x52d3x" path="res://scenes/components/SelectionController.cs" id="1_algeg"]
+
+[node name="SelectionController" type="Node" unique_id=839982818]
+script = ExtResource("1_algeg")
+
+[node name="Timer" type="Timer" parent="." unique_id=966101518]
+unique_name_in_owner = true
+one_shot = true

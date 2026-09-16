@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cvkqcc5c7jb6w"]
+
+[ext_resource type="PackedScene" uid="uid://dl5net6wvy87t" path="res://scenes/interface/WeaponSceneBase.tscn" id="1_1v56n"]
+[ext_resource type="PackedScene" uid="uid://b0gq8aqpigmrj" path="res://scenes/weaponAnime/GlockWeaponAnimeScene.tscn" id="2_dyfom"]
+[ext_resource type="Script" uid="uid://c5oj0in51v6da" path="res://scenes/weapon/GlockWeaponScene.cs" id="2_vvec5"]
+[ext_resource type="PackedScene" uid="uid://dpksbpkhkpht3" path="res://scenes/components/ReloadController.tscn" id="3_brswe"]
+[ext_resource type="Resource" uid="uid://bxaps4bcl8rlt" path="res://data/weaponData/GlockWeaponData.tres" id="3_dgul1"]
+[ext_resource type="PackedScene" uid="uid://i6v33n4p5v07" path="res://scenes/components/AmmoController.tscn" id="5_brswe"]
+[ext_resource type="PackedScene" uid="uid://do7833kog1ybe" path="res://scenes/components/FireSingleController.tscn" id="6_1cqvx"]
+[ext_resource type="PackedScene" uid="uid://ln006olpgfy2" path="res://scenes/components/WeaponRangeStatusController.tscn" id="8_dgul1"]
+
+[node name="WeaponSceneBase" unique_id=1984182305 instance=ExtResource("1_1v56n")]
+script = ExtResource("2_vvec5")
+weaponData = ExtResource("3_dgul1")
+
+[node name="WeaponAnimeScene" parent="Pivot" parent_id_path=PackedInt32Array(1749831632) index="0" unique_id=427498151 instance=ExtResource("2_dyfom")]
+unique_name_in_owner = true
+
+[node name="SelectionController" parent="." index="1" unique_id=839982818]
+unique_name_in_owner = true
+
+[node name="WeaponRangeStatusController" parent="." index="2" unique_id=2076641985 instance=ExtResource("8_dgul1")]
+unique_name_in_owner = true
+
+[node name="AmmoController" parent="." index="3" unique_id=180153848 instance=ExtResource("5_brswe")]
+unique_name_in_owner = true
+
+[node name="FireSingleController" parent="." index="4" unique_id=1741217440 instance=ExtResource("6_1cqvx")]
+unique_name_in_owner = true
+
+[node name="ReloadController" parent="." index="5" unique_id=193252451 instance=ExtResource("3_brswe")]
+unique_name_in_owner = true

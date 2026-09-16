@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://c8r2k4t6nap1x"]
+
+[ext_resource type="PackedScene" uid="uid://e6f2h8k9m5p7v" path="res://scenes/UI/LoadoutSelection.tscn" id="1_selection"]
+
+[node name="TestLoadoutSelection" type="Node2D" unique_id=246813579]
+
+[node name="LoadoutSelection" parent="." unique_id=135792468 instance=ExtResource("1_selection")]

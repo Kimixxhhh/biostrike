@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ov5moiu0m34m"]
+
+[ext_resource type="Script" uid="uid://bfqskucv02t2f" path="res://scenes/components/ButtstockAttackController.cs" id="1_wlx4o"]
+
+[node name="ButtstockAttackController" type="Node" unique_id=1001152982]
+script = ExtResource("1_wlx4o")
+
+[node name="Timer" type="Timer" parent="." unique_id=1093055860]
+unique_name_in_owner = true

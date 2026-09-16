@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://ednw1fnmbfaj"]
+
+[ext_resource type="Texture2D" uid="uid://cubvj56c1dgtw" path="res://assets/characters/ghost.png" id="1_xpyc5"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_xpyc5")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]

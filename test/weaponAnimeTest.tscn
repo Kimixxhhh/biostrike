@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://beepaapbq2ck8"]
+
+[ext_resource type="PackedScene" uid="uid://bgikupo4xwag5" path="res://scenes/weaponAnime/M67WeaponAnimeScene.tscn" id="1_m542o"]
+
+[node name="WeaponAnimeTest" type="Node2D" unique_id=1989143442]
+
+[node name="WeaponAnimeScene" parent="." unique_id=427498151 instance=ExtResource("1_m542o")]

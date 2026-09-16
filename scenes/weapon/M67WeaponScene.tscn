@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bvqedrw650w7g"]
+
+[ext_resource type="PackedScene" uid="uid://dl5net6wvy87t" path="res://scenes/interface/WeaponSceneBase.tscn" id="1_fquy1"]
+[ext_resource type="PackedScene" uid="uid://bgikupo4xwag5" path="res://scenes/weaponAnime/M67WeaponAnimeScene.tscn" id="2_gjsc5"]
+[ext_resource type="Script" uid="uid://nvahbw8yhpq8" path="res://scenes/weapon/M67WeaponScene.cs" id="2_tfiju"]
+[ext_resource type="PackedScene" uid="uid://i6v33n4p5v07" path="res://scenes/components/AmmoController.tscn" id="3_63igc"]
+[ext_resource type="Resource" uid="uid://c38ilnndmuau1" path="res://data/weaponData/M67WeaponData.tres" id="3_wupsb"]
+[ext_resource type="PackedScene" uid="uid://dpksbpkhkpht3" path="res://scenes/components/ReloadController.tscn" id="5_tfiju"]
+[ext_resource type="PackedScene" uid="uid://cr0ebct1u2wfb" path="res://scenes/components/WeaponUtilityStatusController.tscn" id="7_lxrf4"]
+[ext_resource type="PackedScene" uid="uid://d321o3tmhspvd" path="res://scenes/components/UtilityFireController.tscn" id="8_wupsb"]
+
+[node name="WeaponSceneBase" unique_id=1984182305 instance=ExtResource("1_fquy1")]
+script = ExtResource("2_tfiju")
+weaponData = ExtResource("3_wupsb")
+
+[node name="WeaponAnimeScene" parent="Pivot" parent_id_path=PackedInt32Array(1749831632) index="1" unique_id=427498151 instance=ExtResource("2_gjsc5")]
+unique_name_in_owner = true
+
+[node name="SelectionController" parent="." index="1" unique_id=839982818]
+unique_name_in_owner = true
+
+[node name="AmmoController" parent="." index="2" unique_id=180153848 instance=ExtResource("3_63igc")]
+unique_name_in_owner = true
+
+[node name="ReloadController" parent="." index="3" unique_id=193252451 instance=ExtResource("5_tfiju")]
+unique_name_in_owner = true
+
+[node name="WeaponUtilityStatusController" parent="." index="4" unique_id=1590757813 instance=ExtResource("7_lxrf4")]
+unique_name_in_owner = true
+
+[node name="UtilityFireController" parent="." index="5" unique_id=1156094553 instance=ExtResource("8_wupsb")]
+unique_name_in_owner = true

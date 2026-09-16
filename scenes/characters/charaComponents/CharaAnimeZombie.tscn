@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dacpqro6ngsav"]
+
+[ext_resource type="SpriteFrames" uid="uid://bd137thq5w8as" path="res://assets/characters/zombie/framesZombie.tres" id="1_3lxkr"]
+[ext_resource type="Script" uid="uid://cr3545omtjl2b" path="res://scenes/characters/interface/CharaAnimatedSprite2d.cs" id="2_k0fau"]
+
+[node name="CharaAnimeZombie" type="AnimatedSprite2D" unique_id=197952786]
+sprite_frames = ExtResource("1_3lxkr")
+animation = &"walk"
+frame_progress = 0.72003174
+script = ExtResource("2_k0fau")

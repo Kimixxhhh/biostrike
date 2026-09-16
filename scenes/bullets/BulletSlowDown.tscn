@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cj7gcj42malr5"]
+
+[ext_resource type="PackedScene" uid="uid://blbdvfpkjty5r" path="res://scenes/bullets/Bullet.tscn" id="1_1f23v"]
+[ext_resource type="Script" uid="uid://c27n1i73wx7xf" path="res://scenes/bullets/BulletSlowDown.cs" id="2_ttrwt"]
+
+[node name="Bullet" unique_id=1102892245 instance=ExtResource("1_1f23v")]
+script = ExtResource("2_ttrwt")

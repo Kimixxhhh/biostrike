@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://c38ilnndmuau1"]
+
+[ext_resource type="PackedScene" uid="uid://dv2x7gi82xy5p" path="res://scenes/bullets/M67Bullet.tscn" id="1_81g4a"]
+[ext_resource type="Script" uid="uid://db754w076ae3x" path="res://data/WeaponData.cs" id="1_csjpa"]
+[ext_resource type="Texture2D" uid="uid://cwgas3t28mmgw" path="res://assets/weapon/utility/M62.png" id="1_ek2st"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ek2st"]
+atlas = ExtResource("1_ek2st")
+region = Rect2(0, 7.701309, 9, 9.652367)
+
+[resource]
+script = ExtResource("1_csjpa")
+WeaponName = "M67"
+WeaponId = "M67"
+WeaponIcon = SubResource("AtlasTexture_ek2st")
+Damage = 500.0
+BulletSpeed = 250.0
+BulletScene = ExtResource("1_81g4a")
+Price = 500
+LoadoutType = 3
+Cooldown = 0.1
+MagazineRounds = 1
+TotalRounds = 3
+ReloadTime = 1.0
+SwitchTime = 0.5
+RotationInertia = 50.0
+MoveInertia = 1.0
+metadata/_custom_type_script = "uid://db754w076ae3x"

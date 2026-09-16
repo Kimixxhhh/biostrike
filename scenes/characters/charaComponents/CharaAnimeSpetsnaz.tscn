@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://1rsp4jxq2m31"]
+
+[ext_resource type="SpriteFrames" uid="uid://bamhrn0gbpvmq" path="res://assets/characters/spetsnaz/framesSpetsnaz.tres" id="1_4k0e0"]
+[ext_resource type="Script" uid="uid://cr3545omtjl2b" path="res://scenes/characters/interface/CharaAnimatedSprite2d.cs" id="2_sdjn4"]
+
+[node name="CharaAnimeSpetsnaz" type="AnimatedSprite2D" unique_id=1756590953]
+sprite_frames = ExtResource("1_4k0e0")
+animation = &"walk"
+frame_progress = 0.6822475
+script = ExtResource("2_sdjn4")

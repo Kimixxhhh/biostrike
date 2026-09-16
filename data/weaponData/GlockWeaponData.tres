@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://bxaps4bcl8rlt"]
+
+[ext_resource type="Script" uid="uid://db754w076ae3x" path="res://data/WeaponData.cs" id="1_7x8c5"]
+[ext_resource type="PackedScene" uid="uid://cj7gcj42malr5" path="res://scenes/bullets/BulletSlowDown.tscn" id="1_w2jvq"]
+[ext_resource type="Texture2D" uid="uid://idmtep1246pr" path="res://assets/weapon/range/Glock.png" id="2_w2jvq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t87dr"]
+atlas = ExtResource("2_w2jvq")
+region = Rect2(0, 0, 13, 7.163972)
+
+[resource]
+script = ExtResource("1_7x8c5")
+WeaponName = "Glock"
+WeaponId = "Glock"
+WeaponIcon = SubResource("AtlasTexture_t87dr")
+Damage = 15.0
+BulletSpeed = 200.0
+BulletScene = ExtResource("1_w2jvq")
+Price = 500
+LoadoutType = 1
+Overheat = 0.2
+Cooldown = 0.2
+Spread = 20.0
+SpreadMin = 3.0
+SpreadIncrease = 3.0
+SpreadDecrease = 15.0
+MagazineRounds = 15
+TotalRounds = 100
+ReloadTime = 1.0
+SwitchTime = 0.3
+MoveInertia = 1.2
+metadata/_custom_type_script = "uid://db754w076ae3x"

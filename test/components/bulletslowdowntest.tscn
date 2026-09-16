@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://d01sum58prkte"]
+
+[ext_resource type="Script" uid="uid://b36bs0ho5lyeb" path="res://test/components/TestWeaponController.cs" id="1_1uwvp"]
+[ext_resource type="PackedScene" uid="uid://cvkqcc5c7jb6w" path="res://scenes/weapon/GlockWeaponScene.tscn" id="2_d6p5d"]
+
+[node name="Bulletslowdowntest" type="Node2D" unique_id=12314198]
+script = ExtResource("1_1uwvp")
+
+[node name="WeaponSceneBase" parent="." unique_id=1984182305 instance=ExtResource("2_d6p5d")]
+unique_name_in_owner = true

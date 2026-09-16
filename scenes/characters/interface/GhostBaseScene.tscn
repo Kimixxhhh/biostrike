@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://584m5pmrh1xc"]
+
+[ext_resource type="Texture2D" uid="uid://cubvj56c1dgtw" path="res://assets/characters/ghost.png" id="1_u0fx8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3owqy"]
+atlas = ExtResource("1_u0fx8")
+
+[node name="GhostBaseScene" type="CharacterBody2D" unique_id=1603130182]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=901468883]
+shape = SubResource("CircleShape2D_3owqy")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1860660525]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visual" unique_id=354173700]
+texture = SubResource("AtlasTexture_3owqy")

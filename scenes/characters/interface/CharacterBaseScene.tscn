@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dl617vlgxxp4x"]
+
+[ext_resource type="Script" uid="uid://qf610aio2lxi" path="res://scenes/characters/interface/CharacterBaseScene.cs" id="1_sb4bh"]
+[ext_resource type="PackedScene" uid="uid://1rsp4jxq2m31" path="res://scenes/characters/charaComponents/CharaAnimeSpetsnaz.tscn" id="2_sb4bh"]
+[ext_resource type="PackedScene" uid="uid://dipsm7myws7oq" path="res://scenes/characters/components/WeaponController.tscn" id="3_ql5qg"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
+radius = 20.0
+
+[node name="CharacterBaseScene" type="CharacterBody2D" unique_id=387289560]
+script = ExtResource("1_sb4bh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1517608]
+shape = SubResource("CircleShape2D_3owqy")
+
+[node name="Visual" type="Node2D" parent="." unique_id=965285430]
+scale = Vector2(2.5, 2.5)
+
+[node name="CharaAnimeSpetsnaz" parent="Visual" unique_id=1756590953 instance=ExtResource("2_sb4bh")]
+animation = &"idle"
+frame_progress = 0.0
+
+[node name="WeaponController" parent="." unique_id=1089269761 instance=ExtResource("3_ql5qg")]
+position = Vector2(0, 6)

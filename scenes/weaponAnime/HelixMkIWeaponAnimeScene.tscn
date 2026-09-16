@@ -1,0 +1,206 @@
+[gd_scene format=3 uid="uid://ck766evy5ej7s"]
+
+[ext_resource type="PackedScene" uid="uid://by0yhr7k46to1" path="res://scenes/interface/WeaponAnimeScene.tscn" id="1_186j0"]
+[ext_resource type="Texture2D" uid="uid://dheq6efmgaxd8" path="res://assets/weapon/bullets/muzzle_flash.png" id="2_5d8jy"]
+[ext_resource type="Script" uid="uid://cp6vyekjtlvoe" path="res://scenes/weaponAnime/HelixMkIWeaponAnimeScene.cs" id="2_uebmh"]
+[ext_resource type="Texture2D" uid="uid://denn3vwy16cw5" path="res://assets/weapon/range/HelixMk1.png" id="3_uebmh"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g6xm5"]
+atlas = ExtResource("3_uebmh")
+region = Rect2(5.262806, 36.64716, 5.4636955, 7.3528404)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5j10l"]
+atlas = ExtResource("3_uebmh")
+region = Rect2(0, 0, 27, 12.473139)
+
+[sub_resource type="Animation" id="Animation_186j0"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/SpecialEffect:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/xoffset:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/xoffset/Magzine:offset")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Pivot/xoffset/Magzine:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_5d8jy"]
+resource_name = "reload"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.28094, 1.7126534, 1.9665799),
+"transitions": PackedFloat32Array(1.6245072, 2.0705302, 2.3784142, 1),
+"update": 0,
+"values": [0.0, -0.4363323129985824, -0.4363323129985824, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/Magzine:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.005402692, 0.28094, 0.5564773, 1.4641296, 1.6640291, 1.9783893),
+"transitions": PackedFloat32Array(0.25000006, 0.4061264, 1, 0.30778614, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 7), Vector2(0, 7), Vector2(0, 0), Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Pivot/xoffset/Magzine:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.033420086, 0.28634268, 0.5564773, 1.3236595, 1.54517),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Pivot/xoffset:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.25392652, 0.32956418, 0.3943965, 1.5883914, 1.6586264, 1.7342641, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(2, 5), Vector2(0, 0), Vector2(0, 0), Vector2(-2, -3), Vector2(0, 0), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_uebmh"]
+resource_name = "shoot"
+length = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.023223279, 0.04902692),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-5, 0), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Pivot/xoffset/SpecialEffect:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.02390965, 0.04888357),
+"transitions": PackedFloat32Array(0.2332583, 1, 4.141059),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_hn8sb"]
+resource_name = "switch"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Pivot/xoffset:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4754369),
+"transitions": PackedFloat32Array(0.34151006, 1),
+"update": 0,
+"values": [0.0, 6.283185307179586]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hn8sb"]
+_data = {
+&"RESET": SubResource("Animation_186j0"),
+&"reload": SubResource("Animation_5d8jy"),
+&"shoot": SubResource("Animation_uebmh"),
+&"switch": SubResource("Animation_hn8sb")
+}
+
+[node name="WeaponAnimeScene" unique_id=427498151 instance=ExtResource("1_186j0")]
+scale = Vector2(1.7, 1.7)
+script = ExtResource("2_uebmh")
+
+[node name="SpecialEffect" parent="Pivot/xoffset" parent_id_path=PackedInt32Array(2146708407) index="0" unique_id=750639942]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(21.890701, -0.048337936)
+scale = Vector2(-1, 0.7)
+texture = ExtResource("2_5d8jy")
+offset = Vector2(-0.109298706, 0.06905419)
+
+[node name="Magzine" parent="Pivot/xoffset" parent_id_path=PackedInt32Array(2146708407) index="1" unique_id=1231179902]
+position = Vector2(0.29345036, 4.197277)
+texture = SubResource("AtlasTexture_g6xm5")
+
+[node name="Body" parent="Pivot/xoffset" parent_id_path=PackedInt32Array(2146708407) index="2" unique_id=1296419746]
+position = Vector2(6, 1)
+texture = SubResource("AtlasTexture_5j10l")
+
+[node name="AnimationPlayer" parent="." index="1" unique_id=282601806]
+libraries/ = SubResource("AnimationLibrary_hn8sb")
+
+[node name="Marker2D" parent="." index="3" unique_id=345704578]
+position = Vector2(28, 0)

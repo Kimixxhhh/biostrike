@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dl5net6wvy87t"]
+
+[ext_resource type="PackedScene" uid="uid://ba4e0eculdwt1" path="res://scenes/components/SelectionController.tscn" id="1_8lrxg"]
+
+[node name="WeaponSceneBase" type="Node2D" unique_id=1984182305]
+
+[node name="Pivot" type="Node2D" parent="." unique_id=1749831632]
+unique_name_in_owner = true
+
+[node name="Marker2D" type="Marker2D" parent="Pivot" unique_id=528811248]
+unique_name_in_owner = true
+
+[node name="SelectionController" parent="." unique_id=839982818 instance=ExtResource("1_8lrxg")]

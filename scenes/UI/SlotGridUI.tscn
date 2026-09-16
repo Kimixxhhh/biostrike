@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://b8n4r6k1eap30"]
+
+[ext_resource type="Script" uid="uid://c3uam5x7w2q8v" path="res://scenes/UI/SlotGridUI.cs" id="1_slotgrid"]
+
+[node name="SlotGridUI" type="Control" unique_id=424125786]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_slotgrid")
