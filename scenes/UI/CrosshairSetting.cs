@@ -2,13 +2,15 @@ using Godot;
 
 /// <summary>
 /// 准星设置（CrosshairSetting）UI —— 在游戏内实时调整准星样式：
-/// 十字线长度、线条粗细、中心间隙、颜色（RGB 各 0-255 三个输入框）、中心点显示开关。
+/// 十字线长度、线条粗细、中心间隙、颜色（R / G / B 三条 0-255 滑条，竖着排）、中心点显示开关。
 /// 面板中间有实时预览区，直接显示调整后的准星。
 ///
 /// 数据流：本界面把值写入全局静态 <see cref="CrosshairSettingData"/>，再调用 NotifyChanged()；
 /// 场景里每个 Crosshair 在 _Ready 时 Attach 到这份数据并订阅变更，收到通知后立刻重绘。
 /// 因此本界面不依赖场景里是否 / 何时存在准星节点，设置在同一局游戏内也能跨场景保留。
-/// 用法：把 scenes/UI/CrosshairSetting.tscn 实例化到任意 UI 层，显示 / 隐藏即可。
+/// 用法：把 scenes/UI/CrosshairSetting.tscn 实例化到任意 UI 层，显示 / 隐藏即可；
+/// 也可以直接嵌进别的页面（如 StartMenu 设置页的“键盘/鼠标”子标签），
+/// 面板会自动居中到本控件所在的矩形。
 /// </summary>
 public partial class CrosshairSetting : Control
 {
@@ -42,9 +44,12 @@ public partial class CrosshairSetting : Control
 	private Label armValueLabel;
 	private Label gapValueLabel;
 	private Label thicknessValueLabel;
-	private SpinBox redSpin;
-	private SpinBox greenSpin;
-	private SpinBox blueSpin;
+	private HSlider redSlider;
+	private HSlider greenSlider;
+	private HSlider blueSlider;
+	private Label redValueLabel;
+	private Label greenValueLabel;
+	private Label blueValueLabel;
 	private ColorRect colorSwatch;
 	private CheckBox dotCheck;
 
@@ -63,6 +68,9 @@ public partial class CrosshairSetting : Control
 
 		// 每次显示时都用最新数据刷新一遍，避免与运行中被改过的准星不一致
 		VisibilityChanged += OnVisibilityChanged;
+		// 尺寸变化时重新把面板摆到正中：被放进容器（如 StartMenu 设置页的"键盘/鼠标"子页）时，
+		// 本控件的矩形由容器决定，需要跟着容器布局走
+		Resized += CenterPanelInSelf;
 	}
 
 	private void OnVisibilityChanged()
@@ -70,6 +78,8 @@ public partial class CrosshairSetting : Control
 		if (Visible)
 		{
 			SyncControlsFromData();
+			// 延迟一帧：隐藏→显示时容器才刚给出尺寸，等布局完成再摆正面板
+			Callable.From(CenterPanelInSelf).CallDeferred();
 		}
 	}
 
@@ -120,8 +130,8 @@ public partial class CrosshairSetting : Control
 		thicknessSlider = BuildSliderRow(vbox, "线条粗细", 0.5f, MaxThickness, 0.5f, out thicknessValueLabel);
 		thicknessSlider.ValueChanged += OnAnyValueChanged;
 
-		// 颜色（RGB 0-255）
-		BuildColorRow(vbox);
+		// 颜色（RGB 0-255，三行滑条竖着排）
+		BuildColorRows(vbox);
 
 		// 中心点开关
 		var dotRow = new HBoxContainer();
@@ -147,9 +157,10 @@ public partial class CrosshairSetting : Control
 		buttonRow.AddChild(resetButton);
 	}
 
-	/// <summary>一行滑条：左侧标题 + 中间 HSlider + 右侧数值。</summary>
+	/// <summary>一行滑条：左侧标题 + 中间 HSlider + 右侧数值。
+	/// labelWidth 控制左侧标题宽度，用来让各行的滑条左边缘对齐。</summary>
 	private HSlider BuildSliderRow(VBoxContainer parent, string labelText, float minValue, float maxValue,
-		float step, out Label valueLabel)
+		float step, out Label valueLabel, float labelWidth = 110f)
 	{
 		var row = new HBoxContainer();
 		row.AddThemeConstantOverride("separation", 10);
@@ -157,7 +168,7 @@ public partial class CrosshairSetting : Control
 
 		var label = new Label();
 		label.Text = labelText;
-		label.CustomMinimumSize = new Vector2(110f, 0f);
+		label.CustomMinimumSize = new Vector2(labelWidth, 0f);
 		label.SizeFlagsVertical = SizeFlags.ShrinkCenter;
 		label.AddThemeColorOverride("font_color", new Color(0.85f, 0.88f, 0.95f));
 		row.AddChild(label);
@@ -181,56 +192,41 @@ public partial class CrosshairSetting : Control
 		return slider;
 	}
 
-	/// <summary>颜色行：标题 + R / G / B 三个 0-255 数字输入框 + 当前颜色色块。</summary>
-	private void BuildColorRow(VBoxContainer parent)
+	/// <summary>颜色区：标题（右侧带当前颜色色块）+ R / G / B 三行滑条，竖着排，
+	/// 每行都是「名称 + 0-255 滑条 + 数值」，与长度 / 间隙 / 粗细的调法一致。</summary>
+	private void BuildColorRows(VBoxContainer parent)
 	{
-		var row = new HBoxContainer();
-		row.AddThemeConstantOverride("separation", 10);
-		parent.AddChild(row);
+		// 标题行：左“十字线颜色” + 右侧颜色色块
+		var header = new HBoxContainer();
+		header.AddThemeConstantOverride("separation", 10);
+		parent.AddChild(header);
 
-		var label = new Label();
-		label.Text = "十字线颜色";
-		label.CustomMinimumSize = new Vector2(110f, 0f);
-		label.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-		label.AddThemeColorOverride("font_color", new Color(0.85f, 0.88f, 0.95f));
-		row.AddChild(label);
+		var titleLabel = new Label();
+		titleLabel.Text = "十字线颜色";
+		titleLabel.CustomMinimumSize = new Vector2(110f, 0f);
+		titleLabel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+		titleLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.88f, 0.95f));
+		header.AddChild(titleLabel);
 
-		redSpin = BuildChannelBox(row, "R");
-		greenSpin = BuildChannelBox(row, "G");
-		blueSpin = BuildChannelBox(row, "B");
+		var spacer = new Control();
+		spacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		header.AddChild(spacer);
 
 		colorSwatch = new ColorRect();
-		colorSwatch.CustomMinimumSize = new Vector2(44f, 24f);
+		colorSwatch.CustomMinimumSize = new Vector2(48f, 22f);
 		colorSwatch.SizeFlagsVertical = SizeFlags.ShrinkCenter;
 		colorSwatch.MouseFilter = MouseFilterEnum.Ignore;
-		row.AddChild(colorSwatch);
-	}
+		header.AddChild(colorSwatch);
 
-	/// <summary>「通道字母 + 0-255 输入框」小组件。</summary>
-	private SpinBox BuildChannelBox(HBoxContainer parent, string channelName)
-	{
-		var box = new HBoxContainer();
-		box.AddThemeConstantOverride("separation", 4);
-		box.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-		parent.AddChild(box);
+		// R / G / B 三行竖着排（标签宽度与其它行一致，滑条左边缘对齐）
+		redSlider = BuildSliderRow(parent, "R", 0f, 255f, 1f, out redValueLabel);
+		redSlider.ValueChanged += OnAnyValueChanged;
 
-		var label = new Label();
-		label.Text = channelName;
-		label.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-		label.AddThemeColorOverride("font_color", new Color(0.60f, 0.65f, 0.75f));
-		box.AddChild(label);
+		greenSlider = BuildSliderRow(parent, "G", 0f, 255f, 1f, out greenValueLabel);
+		greenSlider.ValueChanged += OnAnyValueChanged;
 
-		var spin = new SpinBox();
-		spin.MinValue = 0;
-		spin.MaxValue = 255;
-		spin.Step = 1;
-		spin.AllowLesser = false;  // 限制在 0-255，输入框里手打超范围的值也会被夹回去
-		spin.AllowGreater = false;
-		spin.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-		spin.ValueChanged += OnAnyValueChanged;
-		box.AddChild(spin);
-
-		return spin;
+		blueSlider = BuildSliderRow(parent, "B", 0f, 255f, 1f, out blueValueLabel);
+		blueSlider.ValueChanged += OnAnyValueChanged;
 	}
 
 	// ------------------------------------------------------------------ 数据
@@ -242,9 +238,9 @@ public partial class CrosshairSetting : Control
 		armSlider.Value = CrosshairSettingData.ArmLength;
 		gapSlider.Value = CrosshairSettingData.Gap;
 		thicknessSlider.Value = CrosshairSettingData.Thickness;
-		redSpin.Value = CrosshairSettingData.ColorR;
-		greenSpin.Value = CrosshairSettingData.ColorG;
-		blueSpin.Value = CrosshairSettingData.ColorB;
+		redSlider.Value = CrosshairSettingData.ColorR;
+		greenSlider.Value = CrosshairSettingData.ColorG;
+		blueSlider.Value = CrosshairSettingData.ColorB;
 		dotCheck.ButtonPressed = CrosshairSettingData.ShowDot;
 		suppressApply = false;
 
@@ -277,9 +273,9 @@ public partial class CrosshairSetting : Control
 		CrosshairSettingData.ArmLength = (float)armSlider.Value;
 		CrosshairSettingData.Gap = (float)gapSlider.Value;
 		CrosshairSettingData.Thickness = (float)thicknessSlider.Value;
-		CrosshairSettingData.ColorR = Mathf.Clamp(Mathf.RoundToInt((float)redSpin.Value), 0, 255);
-		CrosshairSettingData.ColorG = Mathf.Clamp(Mathf.RoundToInt((float)greenSpin.Value), 0, 255);
-		CrosshairSettingData.ColorB = Mathf.Clamp(Mathf.RoundToInt((float)blueSpin.Value), 0, 255);
+		CrosshairSettingData.ColorR = Mathf.Clamp(Mathf.RoundToInt((float)redSlider.Value), 0, 255);
+		CrosshairSettingData.ColorG = Mathf.Clamp(Mathf.RoundToInt((float)greenSlider.Value), 0, 255);
+		CrosshairSettingData.ColorB = Mathf.Clamp(Mathf.RoundToInt((float)blueSlider.Value), 0, 255);
 		CrosshairSettingData.ShowDot = dotCheck.ButtonPressed;
 
 		RefreshVisuals();
@@ -293,6 +289,11 @@ public partial class CrosshairSetting : Control
 		armValueLabel.Text = ((float)armSlider.Value).ToString("0.#");
 		gapValueLabel.Text = ((float)gapSlider.Value).ToString("0.#");
 		thicknessValueLabel.Text = ((float)thicknessSlider.Value).ToString("0.#");
+
+		// RGB 只显示整数（滑条步长 1）
+		redValueLabel.Text = Mathf.RoundToInt((float)redSlider.Value).ToString();
+		greenValueLabel.Text = Mathf.RoundToInt((float)greenSlider.Value).ToString();
+		blueValueLabel.Text = Mathf.RoundToInt((float)blueSlider.Value).ToString();
 
 		colorSwatch.Color = CrosshairSettingData.GetColor();
 		preview.QueueRedraw();
@@ -347,11 +348,26 @@ public partial class CrosshairSetting : Control
 			Size = GetViewportRect().Size;
 		}
 
-		// 先让容器算出面板需要的最小尺寸，再把它摆到屏幕正中
+		CenterPanelInSelf();
+	}
+
+	/// <summary>
+	/// 把面板摆到本控件矩形的正中：独立使用时本控件铺满屏幕 → 面板居中于屏幕；
+	/// 被容器装进某个标签页时本控件占满那一页 → 面板居中于该页。
+	/// </summary>
+	private void CenterPanelInSelf()
+	{
+		// 先让容器算出面板需要的最小尺寸
 		panel.ResetSize();
 		panel.Size = panel.GetCombinedMinimumSize();
 
-		Vector2 viewportSize = GetViewportRect().Size;
-		panel.Position = (viewportSize - panel.Size) * 0.5f;
+		// 尚未完成布局（尺寸还是 0）时退回视口尺寸
+		Vector2 area = Size;
+		if (area.X <= 0f || area.Y <= 0f)
+		{
+			area = GetViewportRect().Size;
+		}
+
+		panel.Position = (area - panel.Size) * 0.5f;
 	}
 }

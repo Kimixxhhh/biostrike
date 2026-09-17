@@ -3,8 +3,9 @@ using Godot;
 /// <summary>
 /// 开始菜单（StartMenu）UI —— 顶部 Tab 栏，从左到右：设置、开始、装备。
 /// Tab 栏左右居中（Alignment = Center）、上下靠上（TabAlignment = Top）。
-/// 点击 Tab 切换下方对应页面。页面为占位内容，可后续替换为真实子 UI
-/// （例如"装备"页可实例化 LoadoutSetting.tscn）。
+/// 点击 Tab 切换下方对应页面。"装备"页接入 LoadoutSetting.tscn；
+/// "设置"页顶部再套一层子 Tab 栏：视频 / 音频 / 游戏 / 键盘/鼠标，
+/// 每个子标签下是可滚动的内容区（可用 GetSettingsPageContent(index) 取到内容容器往里加真实设置项）。
 /// </summary>
 public partial class StartMenu : Control
 {
@@ -16,7 +17,31 @@ public partial class StartMenu : Control
 	[Export] public string StartTabTitle { get; set; } = "开始";
 	[Export] public string LoadoutTabTitle { get; set; } = "装备";
 
+	// 设置页里的四个子标签标题（从左到右），可在 Inspector 里改
+	[Export] public string VideoTabTitle { get; set; } = "视频";
+	[Export] public string AudioTabTitle { get; set; } = "音频";
+	[Export] public string GameTabTitle { get; set; } = "游戏";
+	[Export] public string KeyboardMouseTabTitle { get; set; } = "键盘/鼠标";
+
 	private TabContainer tabs;
+
+	/// <summary>设置页的子 Tab 栏（视频 / 音频 / 游戏 / 键盘/鼠标）。</summary>
+	private TabContainer settingsTabs;
+
+	/// <summary>四个子标签页的内容 VBox（0=视频 1=音频 2=游戏；3=键盘/鼠标 由 CrosshairSetting 占据，为 null）。</summary>
+	private readonly VBoxContainer[] settingsPages = new VBoxContainer[4];
+
+	/// <summary>“键盘/鼠标”子标签在设置页里的下标（接入 CrosshairSetting.tscn 的那一页）。</summary>
+	private const int KeyboardMousePageIndex = 3;
+
+	/// <summary>“键盘/鼠标”子页里使用的准星设置场景。</summary>
+	private const string CrosshairSettingScenePath = "res://scenes/UI/CrosshairSetting.tscn";
+
+	/// <summary>
+	/// 设置页“键盘/鼠标”子页里的准星设置界面（CrosshairSetting.tscn 实例）。
+	/// 需要读/写准星设置时可以直接访问它。
+	/// </summary>
+	public CrosshairSetting CrosshairSettings { get; private set; }
 
 	public override void _Ready()
 	{
@@ -33,7 +58,7 @@ public partial class StartMenu : Control
 		tabs.SetAnchorsPreset(LayoutPreset.FullRect);
 		tabs.TabsPosition = TabContainer.TabPosition.Top; // 上下靠上（Tab 栏在顶部）
 		tabs.TabAlignment = TabBar.AlignmentMode.Center;  // 左右居中
-		StyleTabBar();
+		StyleTabBar(tabs, 20);                            // 主 Tab 字号比设置页子 Tab 大
 		AddChild(tabs);
 
 		// 三个页面：Tab 标题 = 页面节点名（子节点顺序即从左到右顺序）
@@ -48,20 +73,21 @@ public partial class StartMenu : Control
 		tabs.TabChanged += OnTabChanged;
 	}
 
-	/// <summary>给 Tab 栏设置透明背景 + 琥珀色选中样式，与游戏整体风格一致。</summary>
-	private void StyleTabBar()
+	/// <summary>给 Tab 栏设置透明背景 + 琥珀色选中样式，与游戏整体风格一致。
+	/// 外层主 Tab 与设置页的内层子 Tab 共用这套样式（子 Tab 字号小一些）。</summary>
+	private void StyleTabBar(TabContainer target, int fontSize = 16)
 	{
 		// Tab 栏整体背景透明，仅保留各 Tab 选项自身的选中/悬停样式。
 		// 注意：TabContainer 的 tab 栏背景主题项是 "tabbar_background"（不是 "tab_background"，那是个无效名）。
 		var barBg = new StyleBoxFlat();
 		barBg.BgColor = new Color(0f, 0f, 0f, 0f);
 		barBg.SetCornerRadiusAll(8);
-		tabs.AddThemeStyleboxOverride("tabbar_background", barBg);
+		target.AddThemeStyleboxOverride("tabbar_background", barBg);
 
 		// 内容区背景也透明，否则装备页等透明页面会透出默认深灰 panel。
 		var contentBg = new StyleBoxFlat();
 		contentBg.BgColor = new Color(0f, 0f, 0f, 0f);
-		tabs.AddThemeStyleboxOverride("panel", contentBg);
+		target.AddThemeStyleboxOverride("panel", contentBg);
 
 		var tabSelected = new StyleBoxFlat();
 		tabSelected.BgColor = new Color(0.40f, 0.36f, 0.18f, 1f);
@@ -71,41 +97,162 @@ public partial class StartMenu : Control
 		// 左右留白：拉开相邻选项的间隔（三个状态一致，避免悬停时跳变）
 		tabSelected.ContentMarginLeft = 14;
 		tabSelected.ContentMarginRight = 14;
-		tabs.AddThemeStyleboxOverride("tab_selected", tabSelected);
+		target.AddThemeStyleboxOverride("tab_selected", tabSelected);
 
 		var tabHovered = new StyleBoxFlat();
 		tabHovered.BgColor = new Color(0.20f, 0.22f, 0.28f, 1f);
 		tabHovered.SetCornerRadiusAll(6);
 		tabHovered.ContentMarginLeft = 14;
 		tabHovered.ContentMarginRight = 14;
-		tabs.AddThemeStyleboxOverride("tab_hovered", tabHovered);
+		target.AddThemeStyleboxOverride("tab_hovered", tabHovered);
 
 		var tabNormal = new StyleBoxFlat();
 		tabNormal.BgColor = new Color(0f, 0f, 0f, 0f);
 		tabNormal.SetCornerRadiusAll(6);
 		tabNormal.ContentMarginLeft = 14;
 		tabNormal.ContentMarginRight = 14;
-		tabs.AddThemeStyleboxOverride("tab_unselected", tabNormal);
+		target.AddThemeStyleboxOverride("tab_unselected", tabNormal);
 
-		tabs.AddThemeColorOverride("font_selected_color", new Color(1f, 0.90f, 0.60f));
-		tabs.AddThemeColorOverride("font_unselected_color", new Color(0.70f, 0.74f, 0.82f));
-		tabs.AddThemeColorOverride("font_hovered_color", new Color(0.90f, 0.93f, 1f));
-		tabs.AddThemeFontSizeOverride("font_size", 16);
+		target.AddThemeColorOverride("font_selected_color", new Color(1f, 0.90f, 0.60f));
+		target.AddThemeColorOverride("font_unselected_color", new Color(0.70f, 0.74f, 0.82f));
+		target.AddThemeColorOverride("font_hovered_color", new Color(0.90f, 0.93f, 1f));
+		target.AddThemeFontSizeOverride("font_size", fontSize);
 	}
 
+	/// <summary>
+	/// 设置页：顶部再套一层子 Tab 栏，从左到右四个标签 —— 视频 / 音频 / 游戏 / 键盘/鼠标。
+	/// 每个子标签下是可纵向滚动的占位内容区，后续用 GetSettingsPageContent(index) 取到容器填真实设置项。
+	/// </summary>
 	private Control BuildSettingsPage()
 	{
-		var page = BuildPageBase(SettingsTabTitle);
+		// 设置页背景透明（true），露出 StartMenu 后面的画面
+		var page = BuildPageBase(SettingsTabTitle, true);
 
-		var label = new Label();
-		label.Text = "设置页面\n（待实现）";
-		label.HorizontalAlignment = HorizontalAlignment.Center;
-		label.VerticalAlignment = VerticalAlignment.Center;
-		label.AddThemeFontSizeOverride("font_size", 18);
-		label.AddThemeColorOverride("font_color", new Color(0.85f, 0.88f, 0.95f));
-		page.AddChild(label);
+		// 子 Tab 栏：与外层主 Tab 同样的样式（透明背景 + 琥珀色选中）
+		settingsTabs = new TabContainer();
+		settingsTabs.Name = "SettingsTabs";
+		settingsTabs.SetAnchorsPreset(LayoutPreset.FullRect);
+		settingsTabs.TabsPosition = TabContainer.TabPosition.Top; // 标签栏在页面最上面
+		settingsTabs.TabAlignment = TabBar.AlignmentMode.Center;  // 左右居中
+		StyleTabBar(settingsTabs, 15);                            // 子 Tab 字号比主 Tab 小一档
+		page.AddChild(settingsTabs);
 
+		string[] nodeNames = { "Video", "Audio", "Game", "KeyboardMouse" };
+		string[] tabTitles =
+		{
+			VideoTabTitle, AudioTabTitle, GameTabTitle, KeyboardMouseTabTitle,
+		};
+		string[] hints =
+		{
+			"分辨率 / 显示模式 / 画质等选项（待实现）",
+			"主音量 / 音乐 / 音效等选项（待实现）",
+			"难度 / 镜头灵敏度等选项（待实现）",
+		};
+
+		// 前三个子页暂时是占位内容（往 settingsPages[i] 里加真实设置项）
+		for (int i = 0; i < hints.Length; i++)
+		{
+			settingsPages[i] = BuildSettingsSubPage(nodeNames[i], tabTitles[i], hints[i]);
+		}
+
+		// “键盘/鼠标”页直接接入 CrosshairSetting.tscn（准星设置）
+		BuildSettingsCrosshairPage(nodeNames[KeyboardMousePageIndex], tabTitles[KeyboardMousePageIndex]);
+
+		settingsTabs.CurrentTab = 0; // 默认显示“视频”
 		return page;
+	}
+
+	/// <summary>
+	/// “键盘/鼠标”子页：不建占位内容，直接把 CrosshairSetting.tscn（准星设置）铺满整个子页。
+	/// CrosshairSetting 自己会把设置面板摆到所在矩形正中，所以这里只需给它一块够大的区域。
+	/// </summary>
+	private void BuildSettingsCrosshairPage(string nodeName, string tabTitle)
+	{
+		var page = new PanelContainer();
+		page.Name = nodeName;
+
+		// 透明背景：让 CrosshairSetting 自带的面板成为这一页唯一的卡片
+		var box = new StyleBoxFlat();
+		box.BgColor = new Color(0f, 0f, 0f, 0f);
+		page.AddThemeStyleboxOverride("panel", box);
+
+		var scene = GD.Load<PackedScene>(CrosshairSettingScenePath);
+		if (scene == null)
+		{
+			GD.PushError($"[StartMenu] 无法加载 {CrosshairSettingScenePath}，键盘/鼠标页为空");
+		}
+		else
+		{
+			CrosshairSettings = (CrosshairSetting)scene.Instantiate();
+			page.AddChild(CrosshairSettings);
+		}
+
+		settingsTabs.AddChild(page);
+		settingsTabs.SetTabTitle(settingsTabs.GetTabCount() - 1, tabTitle);
+	}
+
+	/// <summary>
+	/// 构建设置页里的一个子标签页（透明背景 + 标题 + 分隔线 + 提示文字），并挂到 settingsTabs 下，
+	/// 同时用 SetTabTitle 设置显示标题（节点名必须合法，"键盘/鼠标"含 "/" 不能直接当节点名）。
+	/// 返回内容 VBox，后续可直接 AddChild 真实设置项。
+	/// </summary>
+	private VBoxContainer BuildSettingsSubPage(string nodeName, string tabTitle, string hint)
+	{
+		var page = new PanelContainer();
+		page.Name = nodeName;
+
+		// 透明背景：露出外层"设置"页的深色面板
+		var box = new StyleBoxFlat();
+		box.BgColor = new Color(0f, 0f, 0f, 0f);
+		box.SetContentMarginAll(18);
+		page.AddThemeStyleboxOverride("panel", box);
+
+		var scroll = new ScrollContainer();
+		scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+		scroll.VerticalScrollMode = ScrollContainer.ScrollMode.Auto;
+		scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+		page.AddChild(scroll);
+
+		var content = new VBoxContainer();
+		content.Name = "Content";
+		content.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		content.AddThemeConstantOverride("separation", 12);
+		scroll.AddChild(content);
+
+		var heading = new Label();
+		heading.Text = tabTitle;
+		heading.AddThemeFontSizeOverride("font_size", 20);
+		heading.AddThemeColorOverride("font_color", new Color(1f, 0.84f, 0.40f));
+		content.AddChild(heading);
+
+		content.AddChild(new HSeparator());
+
+		var hintLabel = new Label();
+		hintLabel.Text = hint;
+		hintLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+		hintLabel.AddThemeFontSizeOverride("font_size", 14);
+		hintLabel.AddThemeColorOverride("font_color", new Color(0.70f, 0.74f, 0.82f));
+		content.AddChild(hintLabel);
+
+		settingsTabs.AddChild(page);
+		settingsTabs.SetTabTitle(settingsTabs.GetTabCount() - 1, tabTitle);
+
+		return content;
+	}
+
+	/// <summary>
+	/// 取设置页某个子标签的内容容器：0=视频 1=音频 2=游戏，越界 / 3=键盘/鼠标 返回 null
+	/// （键盘/鼠标页由 CrosshairSetting 占据，见 CrosshairSettings 属性）。
+	/// 后续填真实设置项时，直接往这个 VBox 里 AddChild 即可。
+	/// </summary>
+	public VBoxContainer GetSettingsPageContent(int index)
+	{
+		if (index < 0 || index >= settingsPages.Length)
+		{
+			return null;
+		}
+		return settingsPages[index];
 	}
 
 	private Control BuildStartPage()
@@ -309,14 +456,15 @@ public partial class StartMenu : Control
 		}
 	}
 
-	/// <summary>创建带深色圆角背景的面板页面，节点名即 Tab 标题。</summary>
-	private Control BuildPageBase(string tabTitle)
+	/// <summary>创建带圆角背景的面板页面，节点名即 Tab 标题。
+	/// transparentBackground = true 时面板背景全透明（内容直接叠在后面的画面上，如设置页）。</summary>
+	private Control BuildPageBase(string tabTitle, bool transparentBackground = false)
 	{
 		var page = new PanelContainer();
 		page.Name = tabTitle;
 
 		var box = new StyleBoxFlat();
-		box.BgColor = new Color(0.08f, 0.09f, 0.12f, 0.92f);
+		box.BgColor = transparentBackground ? new Color(0f, 0f, 0f, 0f) : new Color(0.08f, 0.09f, 0.12f, 0.92f);
 		box.SetCornerRadiusAll(12);
 		box.ContentMarginLeft = 24;
 		box.ContentMarginRight = 24;
