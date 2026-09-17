@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://crjq06pio0mt"]
+
+[ext_resource type="PackedScene" uid="uid://htck03rvotmt" path="res://scenes/UI/HUD.tscn" id="1_hud"]
+
+[node name="TestHUD" type="Node2D" unique_id=369258147]
+
+[node name="HUDLayer" type="CanvasLayer" parent="." unique_id=147852369]
+
+[node name="HUD" parent="HUDLayer" unique_id=258147369 instance=ExtResource("1_hud")]
