@@ -16,6 +16,11 @@ public partial class CharacterBaseScene : CharacterBody2D
 	//divergence limit = 2 * physics fps, beyond this velocity explodes
 	private float maxResisIndex;
 	private WeaponController weaponController;
+	private HealthComponent healthComponent;
+	public HealthComponent HealthComponent
+	{
+		get { return healthComponent; }
+	}
 	public WeaponController WeaponController
 	{
 		get { return weaponController; }
@@ -24,6 +29,7 @@ public partial class CharacterBaseScene : CharacterBody2D
 	public override void _Ready()
 	{
 		weaponController = GetNode<WeaponController>("WeaponController");
+		healthComponent = GetNode<HealthComponent>("HealthComponent");
 		actualResisIndex = resisIndex;
 		maxResisIndex = Engine.PhysicsTicksPerSecond*2f;
 	}

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dacpqro6ngsav" path="res://scenes/characters/charaComponents/CharaAnimeZombie.tscn" id="1_c61o5"]
 [ext_resource type="Script" uid="uid://qf610aio2lxi" path="res://scenes/characters/interface/CharacterBaseScene.cs" id="1_lxeqs"]
 [ext_resource type="PackedScene" uid="uid://dipsm7myws7oq" path="res://scenes/characters/components/WeaponController.tscn" id="3_rnoyb"]
+[ext_resource type="PackedScene" uid="uid://cj5wtgslopkb2" path="res://scenes/characters/components/HealthComponent.tscn" id="4_jdkw7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
 radius = 20.0
@@ -19,3 +20,6 @@ scale = Vector2(2.5, 2.5)
 [node name="CharaAnimeZombie" parent="Visual" unique_id=197952786 instance=ExtResource("1_c61o5")]
 
 [node name="WeaponController" parent="." unique_id=1089269761 instance=ExtResource("3_rnoyb")]
+
+[node name="HealthComponent" parent="." unique_id=1763624360 instance=ExtResource("4_jdkw7")]
+unique_name_in_owner = true

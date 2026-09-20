@@ -1,10 +1,10 @@
 using Godot;
 
 /// <summary>
-/// 开始菜单（StartMenu）UI —— 顶部 Tab 栏，从左到右：设置、开始、装备。
-/// Tab 栏左右居中（Alignment = Center）、上下靠上（TabAlignment = Top）。
-/// 点击 Tab 切换下方对应页面。"装备"页接入 LoadoutSetting.tscn；
-/// "设置"页顶部再套一层子 Tab 栏：视频 / 音频 / 游戏 / 键盘/鼠标，
+/// 开始菜单（StartMenu）UI —— 顶部标签栏，从左到右：设置、开始、装备。
+/// 标签栏左右居中、上下靠上；选中效果 = 字体放大 20% + 字体变亮，不画背景框（见 TextTabContainer）。
+/// 点击标签切换下方对应页面。"装备"页接入 LoadoutSetting.tscn；
+/// "设置"页顶部再套一层子标签栏：视频 / 音频 / 游戏 / 键盘/鼠标，
 /// 每个子标签下是可滚动的内容区（可用 GetSettingsPageContent(index) 取到内容容器往里加真实设置项）。
 /// </summary>
 public partial class StartMenu : Control
@@ -23,10 +23,25 @@ public partial class StartMenu : Control
 	[Export] public string GameTabTitle { get; set; } = "游戏";
 	[Export] public string KeyboardMouseTabTitle { get; set; } = "键盘/鼠标";
 
-	private TabContainer tabs;
+	/// <summary>设置页顶部内容留白（像素）。给一个小值，让设置页的子标签栏贴近主标签栏。</summary>
+	[Export] public int SettingsPageTopMargin { get; set; } = 6;
 
-	/// <summary>设置页的子 Tab 栏（视频 / 音频 / 游戏 / 键盘/鼠标）。</summary>
-	private TabContainer settingsTabs;
+	/// <summary>装备页顶部内容留白（像素）。给一个小值，让配装面板贴近主标签栏。</summary>
+	[Export] public int LoadoutPageTopMargin { get; set; } = 6;
+
+	private TextTabContainer tabs;
+
+	/// <summary>设置页的子标签栏（视频 / 音频 / 游戏 / 键盘/鼠标）。</summary>
+	private TextTabContainer settingsTabs;
+
+	/// <summary>主标签未选中时的字号（选中项 = 该值 × SelectedTabFontScale）。</summary>
+	private const int MainTabFontSize = 20;
+
+	/// <summary>设置页子标签未选中时的字号（比主标签小一档）。</summary>
+	private const int SubTabFontSize = 15;
+
+	/// <summary>选中标签的字号放大倍数（1.2 = 放大 20%）。</summary>
+	private const float SelectedTabFontScale = 1.2f;
 
 	/// <summary>四个子标签页的内容 VBox（0=视频 1=音频 2=游戏；3=键盘/鼠标 由 CrosshairSetting 占据，为 null）。</summary>
 	private readonly VBoxContainer[] settingsPages = new VBoxContainer[4];
@@ -53,70 +68,24 @@ public partial class StartMenu : Control
 
 	private void BuildUi()
 	{
-		// TabContainer 铺满屏幕
-		tabs = new TabContainer();
-		tabs.SetAnchorsPreset(LayoutPreset.FullRect);
-		tabs.TabsPosition = TabContainer.TabPosition.Top; // 上下靠上（Tab 栏在顶部）
-		tabs.TabAlignment = TabBar.AlignmentMode.Center;  // 左右居中
-		StyleTabBar(tabs, 20);                            // 主 Tab 字号比设置页子 Tab 大
+		// 标签页容器铺满屏幕：顶部一排无框文字标签 + 下方页面区域
+		tabs = new TextTabContainer();
+		tabs.Name = "Tabs";
+		tabs.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+		tabs.FontSize = MainTabFontSize;                 // 主标签字号比设置页子标签大
+		tabs.SelectedFontScale = SelectedTabFontScale;   // 选中项再放大 20%
 		AddChild(tabs);
 
-		// 三个页面：Tab 标题 = 页面节点名（子节点顺序即从左到右顺序）
-		tabs.AddChild(BuildSettingsPage());
-		tabs.AddChild(BuildStartPage());
-		tabs.AddChild(BuildLoadoutPage());
+		// 三个页面：第一个参数就是标签标题（添加顺序即从左到右顺序）
+		tabs.AddTab(SettingsTabTitle, BuildSettingsPage());
+		tabs.AddTab(StartTabTitle, BuildStartPage());
+		tabs.AddTab(LoadoutTabTitle, BuildLoadoutPage());
 
-		// 默认选中"开始"页（中间 Tab）
+		// 默认选中"开始"页（中间标签）。要在订阅信号之前设置，避免误触发保存
 		tabs.CurrentTab = 1;
 
 		// 从"装备"页切换到其他页时，把配装数据序列化保存到外部 JSON
 		tabs.TabChanged += OnTabChanged;
-	}
-
-	/// <summary>给 Tab 栏设置透明背景 + 琥珀色选中样式，与游戏整体风格一致。
-	/// 外层主 Tab 与设置页的内层子 Tab 共用这套样式（子 Tab 字号小一些）。</summary>
-	private void StyleTabBar(TabContainer target, int fontSize = 16)
-	{
-		// Tab 栏整体背景透明，仅保留各 Tab 选项自身的选中/悬停样式。
-		// 注意：TabContainer 的 tab 栏背景主题项是 "tabbar_background"（不是 "tab_background"，那是个无效名）。
-		var barBg = new StyleBoxFlat();
-		barBg.BgColor = new Color(0f, 0f, 0f, 0f);
-		barBg.SetCornerRadiusAll(8);
-		target.AddThemeStyleboxOverride("tabbar_background", barBg);
-
-		// 内容区背景也透明，否则装备页等透明页面会透出默认深灰 panel。
-		var contentBg = new StyleBoxFlat();
-		contentBg.BgColor = new Color(0f, 0f, 0f, 0f);
-		target.AddThemeStyleboxOverride("panel", contentBg);
-
-		var tabSelected = new StyleBoxFlat();
-		tabSelected.BgColor = new Color(0.40f, 0.36f, 0.18f, 1f);
-		tabSelected.BorderColor = new Color(1f, 0.84f, 0.40f, 1f);
-		tabSelected.SetBorderWidthAll(1);
-		tabSelected.SetCornerRadiusAll(6);
-		// 左右留白：拉开相邻选项的间隔（三个状态一致，避免悬停时跳变）
-		tabSelected.ContentMarginLeft = 14;
-		tabSelected.ContentMarginRight = 14;
-		target.AddThemeStyleboxOverride("tab_selected", tabSelected);
-
-		var tabHovered = new StyleBoxFlat();
-		tabHovered.BgColor = new Color(0.20f, 0.22f, 0.28f, 1f);
-		tabHovered.SetCornerRadiusAll(6);
-		tabHovered.ContentMarginLeft = 14;
-		tabHovered.ContentMarginRight = 14;
-		target.AddThemeStyleboxOverride("tab_hovered", tabHovered);
-
-		var tabNormal = new StyleBoxFlat();
-		tabNormal.BgColor = new Color(0f, 0f, 0f, 0f);
-		tabNormal.SetCornerRadiusAll(6);
-		tabNormal.ContentMarginLeft = 14;
-		tabNormal.ContentMarginRight = 14;
-		target.AddThemeStyleboxOverride("tab_unselected", tabNormal);
-
-		target.AddThemeColorOverride("font_selected_color", new Color(1f, 0.90f, 0.60f));
-		target.AddThemeColorOverride("font_unselected_color", new Color(0.70f, 0.74f, 0.82f));
-		target.AddThemeColorOverride("font_hovered_color", new Color(0.90f, 0.93f, 1f));
-		target.AddThemeFontSizeOverride("font_size", fontSize);
 	}
 
 	/// <summary>
@@ -125,17 +94,15 @@ public partial class StartMenu : Control
 	/// </summary>
 	private Control BuildSettingsPage()
 	{
-		// 设置页背景透明（true），露出 StartMenu 后面的画面
-		var page = BuildPageBase(SettingsTabTitle, true);
+		// 设置页背景透明（true），露出 StartMenu 后面的画面；顶部留白给小值，子标签栏贴近主标签栏
+		var page = BuildPageBase(SettingsTabTitle, true, SettingsPageTopMargin);
 
-		// 子 Tab 栏：与外层主 Tab 同样的样式（透明背景 + 琥珀色选中）
-		settingsTabs = new TabContainer();
+		// 子标签栏：与外层主标签栏同样的无框样式（选中项放大 20% + 变亮），字号小一档
+		settingsTabs = new TextTabContainer();
 		settingsTabs.Name = "SettingsTabs";
-		settingsTabs.SetAnchorsPreset(LayoutPreset.FullRect);
-		settingsTabs.TabsPosition = TabContainer.TabPosition.Top; // 标签栏在页面最上面
-		settingsTabs.TabAlignment = TabBar.AlignmentMode.Center;  // 左右居中
-		StyleTabBar(settingsTabs, 15);                            // 子 Tab 字号比主 Tab 小一档
-		page.AddChild(settingsTabs);
+		settingsTabs.FontSize = SubTabFontSize;
+		settingsTabs.SelectedFontScale = SelectedTabFontScale;
+		page.AddChild(settingsTabs); // PanelContainer 会把子标签容器铺满内容区
 
 		string[] nodeNames = { "Video", "Audio", "Game", "KeyboardMouse" };
 		string[] tabTitles =
@@ -187,13 +154,12 @@ public partial class StartMenu : Control
 			page.AddChild(CrosshairSettings);
 		}
 
-		settingsTabs.AddChild(page);
-		settingsTabs.SetTabTitle(settingsTabs.GetTabCount() - 1, tabTitle);
+		settingsTabs.AddTab(tabTitle, page);
 	}
 
 	/// <summary>
-	/// 构建设置页里的一个子标签页（透明背景 + 标题 + 分隔线 + 提示文字），并挂到 settingsTabs 下，
-	/// 同时用 SetTabTitle 设置显示标题（节点名必须合法，"键盘/鼠标"含 "/" 不能直接当节点名）。
+	/// 构建设置页里的一个子标签页（透明背景 + 标题 + 分隔线 + 提示文字），并作为标签挂到 settingsTabs 下。
+	/// 标签标题直接传中文（"键盘/鼠标"这类含 "/" 的也能用，不受节点名限制）。
 	/// 返回内容 VBox，后续可直接 AddChild 真实设置项。
 	/// </summary>
 	private VBoxContainer BuildSettingsSubPage(string nodeName, string tabTitle, string hint)
@@ -235,8 +201,7 @@ public partial class StartMenu : Control
 		hintLabel.AddThemeColorOverride("font_color", new Color(0.70f, 0.74f, 0.82f));
 		content.AddChild(hintLabel);
 
-		settingsTabs.AddChild(page);
-		settingsTabs.SetTabTitle(settingsTabs.GetTabCount() - 1, tabTitle);
+		settingsTabs.AddTab(tabTitle, page);
 
 		return content;
 	}
@@ -295,13 +260,17 @@ public partial class StartMenu : Control
 	{
 		// 装备页直接接入 LoadoutSetting：上方 5x5 配装选择 + 下方武器装备列表
 		var scene = GD.Load<PackedScene>("res://scenes/UI/LoadoutSetting.tscn");
-		var page = (Control)scene.Instantiate();
-		page.Name = LoadoutTabTitle; // 节点名即 Tab 标题
+		var page = (LoadoutSetting)scene.Instantiate();
+		page.Name = LoadoutTabTitle; // 节点名（不再是标签标题的来源）
+
+		// 标签栏已经占了屏幕顶部，这里把 LoadoutSetting 自带的顶部留白（默认 20）调小，让面板贴近标签栏
+		page.TopMargin = LoadoutPageTopMargin;
+
 		return page;
 	}
 
-	/// <summary>Tab 切换时触发：若从"装备"页切到其他页，把配装数据序列化保存到外部 JSON。</summary>
-	private void OnTabChanged(long newTab)
+	/// <summary>标签切换时触发：若从"装备"页切到其他页，把配装数据序列化保存到外部 JSON。</summary>
+	private void OnTabChanged(int newTab)
 	{
 		int loadoutTab = GetLoadoutTabIndex();
 		if (loadoutTab < 0 || newTab == loadoutTab)
@@ -309,16 +278,16 @@ public partial class StartMenu : Control
 			return;
 		}
 		// 只有确实是从"装备"页切走时才保存
-		if (tabs.GetPreviousTab() == loadoutTab)
+		if (tabs.PreviousTab == loadoutTab)
 		{
 			SaveLoadoutData();
 		}
 	}
 
-	/// <summary>查找"装备"页对应的 Tab 索引。</summary>
+	/// <summary>查找"装备"页对应的标签索引。</summary>
 	private int GetLoadoutTabIndex()
 	{
-		for (int i = 0; i < tabs.GetTabCount(); i++)
+		for (int i = 0; i < tabs.TabCount; i++)
 		{
 			if (tabs.GetTabTitle(i) == LoadoutTabTitle)
 			{
@@ -457,8 +426,9 @@ public partial class StartMenu : Control
 	}
 
 	/// <summary>创建带圆角背景的面板页面，节点名即 Tab 标题。
-	/// transparentBackground = true 时面板背景全透明（内容直接叠在后面的画面上，如设置页）。</summary>
-	private Control BuildPageBase(string tabTitle, bool transparentBackground = false)
+	/// transparentBackground = true 时面板背景全透明（内容直接叠在后面的画面上，如设置页）。
+	/// topContentMargin 是面板顶部的内容留白（设置页传小值，让子标签栏贴近主标签栏）。</summary>
+	private Control BuildPageBase(string tabTitle, bool transparentBackground = false, int topContentMargin = 24)
 	{
 		var page = new PanelContainer();
 		page.Name = tabTitle;
@@ -468,7 +438,7 @@ public partial class StartMenu : Control
 		box.SetCornerRadiusAll(12);
 		box.ContentMarginLeft = 24;
 		box.ContentMarginRight = 24;
-		box.ContentMarginTop = 24;
+		box.ContentMarginTop = topContentMargin;
 		box.ContentMarginBottom = 24;
 		page.AddThemeStyleboxOverride("panel", box);
 

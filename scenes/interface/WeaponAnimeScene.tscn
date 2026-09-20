@@ -20,5 +20,6 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=881796668]
+unique_name_in_owner = true
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=345704578]

@@ -16,6 +16,7 @@ public partial class AR15WeaponAnimeScene : BasicWeaponAnime
 	public override void PlayAttack1Anime()
 	{
 		anime.Play("shoot");
+		musicPlayer.Play();
 	}
 	public override void PlayAttack2Anime()
 	{

@@ -43,6 +43,7 @@ public partial class FireAutoController : Node
         {
             cooldown = 0;
             ammoController.magazineRounds-=1;
+            ammoController.BroadcastAmmo(); // 更新 HUD 的弹药量
             generateBullet();
             SpreadIncrease();
             weapon.Anime.PlayAttack1Anime();

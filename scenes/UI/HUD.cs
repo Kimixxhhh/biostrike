@@ -2,8 +2,13 @@ using Godot;
 
 /// <summary>
 /// 游戏内 HUD（平视信息层）—— 左下角血量、右下角弹药 / 备弹、底部居中击杀数。
-/// 目前只做画面效果：数值来自导出属性，可用 SetHealth / SetAmmo / SetKills / SetWeaponName 直接改；
-/// 尚未与玩家真实数据绑定，以后接数据时只需把调用处换成从玩家 / 武器组件读值（或在这些方法里转发）。
+/// 血量已接全局数据：订阅 EventBus 的 MaxHealthChanged（血条上限）与 HealthChanged（当前血量）两个信号，
+/// 由 HealthComponent 发出；
+/// 弹药按武器槽位分块：每块弹药 UI 对应 WeaponController 的一个槽位（数量 = AmmoSlotCount，默认 4），
+/// 各槽位的武器用 AmmoChanged(槽位, 弹匣内, 备弹) / WeaponSlotNameChanged(槽位, 名) 只更新自己那块，
+/// 哪一块显示由 WeaponSlotSelected(槽位) 决定；发出方为 AmmoController（初始化）、FireAutoController（开火）、
+/// ReloadController（换弹完成）、WeaponController（装备第一把 / 切枪）；
+/// 击杀仍是导出属性，可用 SetKills 直接改，以后接数据时同理转发。
 /// 用法：把 scenes/UI/HUD.tscn 实例化到任意 CanvasLayer（例如 test.tscn 里的 HUD）下。
 /// 独立预览：test/testHUD.tscn。
 /// </summary>
@@ -18,16 +23,22 @@ public partial class HUD : Control
 	/// <summary>最大血量。</summary>
 	[Export] public int MaxHealth { get; set; } = 100;
 
-	/// <summary>当前弹匣内子弹数（右下角大号数字）。</summary>
+	/// <summary>弹药 UI 的块数 = 武器槽位数（与 WeaponController.WeaponSlotsAmount 对应）。</summary>
+	[Export] public int AmmoSlotCount { get; set; } = 4;
+
+	/// <summary>当前显示哪一块弹药 UI（槽位号；-1 = 都不显示）。会由 WeaponSlotSelected 信号覆盖。</summary>
+	[Export] public int SelectedAmmoSlot { get; set; } = 0;
+
+	/// <summary>各槽位弹匣内子弹数的初始值（收到 AmmoChanged 后按槽位覆盖）。</summary>
 	[Export] public int MagazineRounds { get; set; } = 30;
 
-	/// <summary>备弹数（右下角斜杠后的小号数字）。</summary>
+	/// <summary>各槽位备弹数的初始值（收到 AmmoChanged 后按槽位覆盖）。</summary>
 	[Export] public int ReserveRounds { get; set; } = 120;
 
 	/// <summary>击杀数（底部居中）。</summary>
 	[Export] public int Kills { get; set; } = 0;
 
-	/// <summary>右下角显示的武器名。</summary>
+	/// <summary>各槽位武器名的初始值（收到 WeaponSlotNameChanged 后按槽位覆盖）。</summary>
 	[Export] public string WeaponName { get; set; } = "AR-15";
 
 	// 配色（与开始菜单 / 准星设置一致的琥珀色风格）
@@ -36,20 +47,32 @@ public partial class HUD : Control
 	private static readonly Color HealthBar = new Color(0.80f, 0.18f, 0.18f);
 
 	private PanelContainer healthPanel;
-	private PanelContainer ammoPanel;
 	private PanelContainer killsPanel;
+
+	/// <summary>各槽位弹药块共用的容器（只显示选中槽位那一块）。</summary>
+	private VBoxContainer ammoStack;
+
+	// 每个武器槽位一套弹药 UI（下标 = 槽位号）
+	private PanelContainer[] ammoPanels;
+	private Label[] weaponLabels;
+	private Label[] magazineLabels;
+	private Label[] reserveLabels;
+
+	// 各槽位缓存的数值 / 武器名（与控件分开存，没显示的那几块也能先收下数据）
+	private int[] slotMagazine;
+	private int[] slotReserve;
+	private string[] slotWeaponName;
 
 	private ProgressBar healthBar;
 	private Label healthLabel;
-
-	private Label weaponLabel;
-	private Label magazineLabel;
-	private Label reserveLabel;
 
 	private Label killsLabel;
 
 	/// <summary>是否已监听过视口尺寸变化（父级不是 Control 时才需要）。</summary>
 	private bool viewportHooked;
+
+	/// <summary>是否已订阅 EventBus 的全局信号（防重复订阅 / 重复退订）。</summary>
+	private bool eventBusHooked;
 
 	public override void _Ready()
 	{
@@ -59,6 +82,7 @@ public partial class HUD : Control
 		SyncSizeToParent();
 		BuildUi();
 		RefreshDisplay();
+		SubscribeToEventBus();
 
 		// 屏幕 / 父级尺寸变化时重新把三块信息摆到角上
 		Resized += LayoutBlocks;
@@ -72,6 +96,16 @@ public partial class HUD : Control
 
 	public override void _ExitTree()
 	{
+		if (eventBusHooked && EventBus.Instance != null)
+		{
+			EventBus.Instance.HealthChanged -= OnHealthChanged;
+			EventBus.Instance.MaxHealthChanged -= OnMaxHealthChanged;
+			EventBus.Instance.AmmoChanged -= OnAmmoChanged;
+			EventBus.Instance.WeaponSlotSelected -= OnWeaponSlotSelected;
+			EventBus.Instance.WeaponSlotNameChanged -= OnWeaponSlotNameChanged;
+			eventBusHooked = false;
+		}
+
 		if (viewportHooked && GetViewport() != null)
 		{
 			GetViewport().SizeChanged -= OnViewportSizeChanged;
@@ -79,9 +113,74 @@ public partial class HUD : Control
 		}
 	}
 
+	// ------------------------------------------------------------------ 全局信号（EventBus）
+
+	/// <summary>
+	/// 订阅 EventBus 的全局信号：血条跟随 HealthComponent，弹药跟随各武器槽位的 AmmoController / WeaponController。
+	/// EventBus 是 autoload，HUD 的 _Ready 时其实例已经就绪。
+	/// </summary>
+	private void SubscribeToEventBus()
+	{
+		EventBus bus = EventBus.Instance;
+		if (bus == null)
+		{
+			GD.PushWarning("HUD: 找不到 EventBus 自动加载实例，血条 / 弹药不会跟随全局信号刷新。");
+			return;
+		}
+
+		if (!eventBusHooked)
+		{
+			bus.MaxHealthChanged += OnMaxHealthChanged;       // 血量上限 → 血条最大值
+			bus.HealthChanged += OnHealthChanged;             // 当前血量 → 血条当前值
+			bus.AmmoChanged += OnAmmoChanged;                 // 槽位弹药 → 对应那块弹药 UI
+			bus.WeaponSlotSelected += OnWeaponSlotSelected;   // 选中槽位 → 显示哪一块弹药 UI
+			bus.WeaponSlotNameChanged += OnWeaponSlotNameChanged; // 槽位武器名
+			eventBusHooked = true;
+		}
+	}
+
+	/// <summary>EventBus.MaxHealthChanged 的回调：设置血条上限（当前血量同时截到上限内）。</summary>
+	private void OnMaxHealthChanged(float newMaxHealth)
+	{
+		int max = Mathf.Max(1, Mathf.RoundToInt(newMaxHealth));
+		SetHealth(Mathf.Min(Health, max), max);
+	}
+
+	/// <summary>
+	/// EventBus.HealthChanged 的回调。上限正常由 MaxHealthChanged 单独给（HealthComponent 会先发上限再发当前值）；
+	/// 万一只收到血量没收到上限，就把上限抬到不低于当前值，避免血条被截断。
+	/// </summary>
+	private void OnHealthChanged(float newHealth)
+	{
+		int value = Mathf.Max(0, Mathf.RoundToInt(newHealth));
+		int max = Mathf.Max(Mathf.Max(MaxHealth, value), 1);
+		SetHealth(value, max);
+	}
+
+	/// <summary>
+	/// EventBus.AmmoChanged 的回调：某槽位的 AmmoController 初始化 / 开火，以及 ReloadController 换弹完成时发出。
+	/// 只刷新该槽位自己的那块弹药 UI（没显示的那几块先存着）。
+	/// </summary>
+	private void OnAmmoChanged(int weaponSlot, int magazineRounds, int totalRounds)
+	{
+		SetSlotAmmo(weaponSlot, magazineRounds, totalRounds);
+	}
+
+	/// <summary>EventBus.WeaponSlotSelected 的回调：切换显示哪一块弹药 UI（-1 = 全部隐藏）。</summary>
+	private void OnWeaponSlotSelected(int weaponSlot)
+	{
+		SetSelectedAmmoSlot(weaponSlot);
+	}
+
+	/// <summary>EventBus.WeaponSlotNameChanged 的回调：刷新某槽位弹药块上方的武器名。</summary>
+	private void OnWeaponSlotNameChanged(int weaponSlot, string weaponName)
+	{
+		SetSlotWeaponName(weaponSlot, weaponName);
+	}
+
 	// ------------------------------------------------------------------ 对外接口
 
-	/// <summary>设置血量（以后接真实数据时调它）。</summary>
+	/// <summary>设置血量并立即刷新（也可由外部在收到数据后直接调用）。</summary>
 	public void SetHealth(int current, int max)
 	{
 		Health = Mathf.Max(0, current);
@@ -89,12 +188,30 @@ public partial class HUD : Control
 		RefreshDisplay();
 	}
 
-	/// <summary>设置弹药：弹匣内子弹数 + 备弹数。</summary>
-	public void SetAmmo(int magazine, int reserve)
+	/// <summary>设置某个武器槽位的弹药：弹匣内子弹数 + 备弹数。</summary>
+	public void SetSlotAmmo(int weaponSlot, int magazine, int reserve)
 	{
-		MagazineRounds = Mathf.Max(0, magazine);
-		ReserveRounds = Mathf.Max(0, reserve);
-		RefreshDisplay();
+		if (!IsValidAmmoSlot(weaponSlot))
+		{
+			return;
+		}
+
+		slotMagazine[weaponSlot] = Mathf.Max(0, magazine);
+		slotReserve[weaponSlot] = Mathf.Max(0, reserve);
+		RefreshAmmoSlot(weaponSlot);
+
+		if (weaponSlot == SelectedAmmoSlot)
+		{
+			LayoutBlocks(); // 数字宽度变了，重新贴到屏幕右下角
+		}
+	}
+
+	/// <summary>切换显示哪一块弹药 UI（槽位号；-1 = 都不显示）。</summary>
+	public void SetSelectedAmmoSlot(int weaponSlot)
+	{
+		SelectedAmmoSlot = weaponSlot;
+		ApplyAmmoSlotVisibility();
+		LayoutBlocks();
 	}
 
 	/// <summary>设置击杀数。</summary>
@@ -104,11 +221,22 @@ public partial class HUD : Control
 		RefreshDisplay();
 	}
 
-	/// <summary>设置右下角武器名。</summary>
-	public void SetWeaponName(string name)
+	/// <summary>设置某个武器槽位显示的武器名。</summary>
+	public void SetSlotWeaponName(int weaponSlot, string name)
 	{
-		WeaponName = name ?? string.Empty;
-		RefreshDisplay();
+		if (!IsValidAmmoSlot(weaponSlot))
+		{
+			return;
+		}
+
+		slotWeaponName[weaponSlot] = name ?? string.Empty;
+		RefreshAmmoSlot(weaponSlot);
+	}
+
+	/// <summary>槽位号是否对应一块存在的弹药 UI（字段没建好 / 越界 / EventBus.NoWeaponSlot 都算无效）。</summary>
+	private bool IsValidAmmoSlot(int weaponSlot)
+	{
+		return magazineLabels != null && weaponSlot >= 0 && weaponSlot < magazineLabels.Length;
 	}
 
 	// ------------------------------------------------------------------ UI 构建
@@ -170,42 +298,77 @@ public partial class HUD : Control
 		stack.AddChild(healthLabel);
 	}
 
-	/// <summary>右下角：武器名 + 大号弹匣数 + 斜杠备弹数。</summary>
+	/// <summary>右下角：每个武器槽位一块「武器名 + 大号弹匣数 + 斜杠备弹数」，同一时刻只显示选中槽位那一块。</summary>
 	private void BuildAmmoBlock()
 	{
-		ammoPanel = BuildBlockContainer();
-		AddChild(ammoPanel);
+		// 四块弹药 UI 叠在同一个 VBox 里：隐藏的块不占位置，容器尺寸 = 当前显示那块
+		ammoStack = new VBoxContainer();
+		ammoStack.Alignment = BoxContainer.AlignmentMode.End;
+		ammoStack.MouseFilter = MouseFilterEnum.Ignore;
+		ammoStack.AddThemeConstantOverride("separation", 0);
+		AddChild(ammoStack);
+
+		int slotCount = Mathf.Max(1, AmmoSlotCount);
+		ammoPanels = new PanelContainer[slotCount];
+		weaponLabels = new Label[slotCount];
+		magazineLabels = new Label[slotCount];
+		reserveLabels = new Label[slotCount];
+		slotMagazine = new int[slotCount];
+		slotReserve = new int[slotCount];
+		slotWeaponName = new string[slotCount];
+
+		for (int i = 0; i < slotCount; i++)
+		{
+			// 导出属性作为初始值：武器接上后会用自己的 AmmoChanged / WeaponSlotNameChanged 覆盖
+			slotMagazine[i] = Mathf.Max(0, MagazineRounds);
+			slotReserve[i] = Mathf.Max(0, ReserveRounds);
+			slotWeaponName[i] = WeaponName ?? string.Empty;
+			BuildAmmoSlot(i);
+		}
+
+		ApplyAmmoSlotVisibility();
+	}
+
+	/// <summary>构建单个槽位的弹药块（挂在 ammoStack 下）。</summary>
+	private void BuildAmmoSlot(int weaponSlot)
+	{
+		PanelContainer panel = BuildBlockContainer();
+		ammoStack.AddChild(panel);
+		ammoPanels[weaponSlot] = panel;
 
 		var box = new VBoxContainer();
 		box.AddThemeConstantOverride("separation", 0);
 		box.Alignment = BoxContainer.AlignmentMode.End; // 内容整体靠右
-		ammoPanel.AddChild(box);
+		panel.AddChild(box);
 
-		weaponLabel = new Label();
+		var weaponLabel = new Label();
 		weaponLabel.HorizontalAlignment = HorizontalAlignment.Right;
 		weaponLabel.AddThemeFontSizeOverride("font_size", 13);
 		weaponLabel.AddThemeColorOverride("font_color", TextDim);
 		box.AddChild(weaponLabel);
+		weaponLabels[weaponSlot] = weaponLabel;
 
 		var row = new HBoxContainer();
 		row.Alignment = BoxContainer.AlignmentMode.End;
 		row.AddThemeConstantOverride("separation", 6);
 		box.AddChild(row);
 
-		magazineLabel = new Label();
+		var magazineLabel = new Label();
 		magazineLabel.CustomMinimumSize = new Vector2(62f, 0f);
 		magazineLabel.HorizontalAlignment = HorizontalAlignment.Right;
 		magazineLabel.VerticalAlignment = VerticalAlignment.Bottom;
 		magazineLabel.AddThemeFontSizeOverride("font_size", 38);
 		magazineLabel.AddThemeColorOverride("font_color", Amber);
 		row.AddChild(magazineLabel);
+		magazineLabels[weaponSlot] = magazineLabel;
 
-		reserveLabel = new Label();
+		var reserveLabel = new Label();
 		reserveLabel.CustomMinimumSize = new Vector2(64f, 0f);
 		reserveLabel.VerticalAlignment = VerticalAlignment.Bottom;
 		reserveLabel.AddThemeFontSizeOverride("font_size", 20);
 		reserveLabel.AddThemeColorOverride("font_color", TextDim);
 		row.AddChild(reserveLabel);
+		reserveLabels[weaponSlot] = reserveLabel;
 	}
 
 	/// <summary>底部居中：击杀数。</summary>
@@ -258,7 +421,7 @@ public partial class HUD : Control
 
 	// ------------------------------------------------------------------ 数值 / 布局
 
-	/// <summary>把导出属性里的数值刷到画面上（以后接真实数据时改这里即可）。</summary>
+	/// <summary>把缓存的数值刷到画面上（以后接真实数据时改这里即可）。</summary>
 	public void RefreshDisplay()
 	{
 		int maxHealth = Mathf.Max(MaxHealth, 1);
@@ -268,12 +431,41 @@ public partial class HUD : Control
 		healthBar.Value = currentHealth;
 		healthLabel.Text = $"{currentHealth} / {maxHealth}";
 
-		weaponLabel.Text = WeaponName;
-		magazineLabel.Text = MagazineRounds.ToString();
-		reserveLabel.Text = $"/ {ReserveRounds}";
+		for (int i = 0; i < magazineLabels.Length; i++)
+		{
+			RefreshAmmoSlot(i);
+		}
+
 		killsLabel.Text = Kills.ToString();
 
 		LayoutBlocks();
+	}
+
+	/// <summary>把某个槽位缓存的弹药数值 / 武器名刷到它那块控件上。</summary>
+	private void RefreshAmmoSlot(int weaponSlot)
+	{
+		if (!IsValidAmmoSlot(weaponSlot))
+		{
+			return;
+		}
+
+		weaponLabels[weaponSlot].Text = slotWeaponName[weaponSlot];
+		magazineLabels[weaponSlot].Text = slotMagazine[weaponSlot].ToString();
+		reserveLabels[weaponSlot].Text = $"/ {slotReserve[weaponSlot]}";
+	}
+
+	/// <summary>只让当前选中槽位的弹药块可见（SelectedAmmoSlot 为 -1 / 越界时四块全隐藏）。</summary>
+	private void ApplyAmmoSlotVisibility()
+	{
+		if (ammoPanels == null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < ammoPanels.Length; i++)
+		{
+			ammoPanels[i].Visible = i == SelectedAmmoSlot;
+		}
 	}
 
 	/// <summary>左下血量、右下弹药、底部居中击杀数（父级尺寸变化时重算）。</summary>
@@ -291,9 +483,9 @@ public partial class HUD : Control
 		healthPanel.Size = healthSize;
 		healthPanel.Position = new Vector2(margin, area.Y - healthSize.Y - margin);
 
-		Vector2 ammoSize = ammoPanel.GetCombinedMinimumSize();
-		ammoPanel.Size = ammoSize;
-		ammoPanel.Position = new Vector2(area.X - ammoSize.X - margin, area.Y - ammoSize.Y - margin);
+		Vector2 ammoSize = ammoStack.GetCombinedMinimumSize();
+		ammoStack.Size = ammoSize;
+		ammoStack.Position = new Vector2(area.X - ammoSize.X - margin, area.Y - ammoSize.Y - margin);
 
 		Vector2 killsSize = killsPanel.GetCombinedMinimumSize();
 		killsPanel.Size = killsSize;

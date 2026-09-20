@@ -4,6 +4,7 @@ using System;
 public partial class BasicWeaponAnime : Node2D,IWeaponAnime
 {
 	protected AnimationPlayer anime;
+	protected AudioStreamPlayer2D musicPlayer;
 	public AnimationPlayer Anime { get => anime; }
 	protected Sprite2D pivot;
 	public Marker2D marker2D;
@@ -13,6 +14,9 @@ public partial class BasicWeaponAnime : Node2D,IWeaponAnime
 		anime = GetNode<AnimationPlayer>("%AnimationPlayer");
 		pivot = GetNode<Sprite2D>("%Pivot");
 		marker2D = GetNode<Marker2D>("%Marker2D");
+		musicPlayer = GetNode<AudioStreamPlayer2D>("%AudioStreamPlayer2D"); 
+		musicPlayer.Bus = "SFX";
+		musicPlayer.MaxPolyphony = 5;
 	}
 	public void PlayResetAnime()
 	{

@@ -27,6 +27,7 @@ public partial class Bullet : Area2D
 		if(body is CharacterBaseScene character)
 		{
 			character.TakeImpact(Vector2.FromAngle(GlobalRotation)*weapon.WeaponData.BulletImpact);
+			character.HealthComponent.TakeDamage(weapon.WeaponData.Damage);
 		}
 		QueueFree();
 	}

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bnjfnjbsob18e" path="res://assets/weapon/range/AR15_body.png" id="3_8hlbx"]
 [ext_resource type="Texture2D" uid="uid://cgw7l07c2q7jo" path="res://assets/weapon/range/AR15_magzine.png" id="4_ro1jm"]
 [ext_resource type="Texture2D" uid="uid://dheq6efmgaxd8" path="res://assets/weapon/bullets/muzzle_flash.png" id="5_gp2pd"]
+[ext_resource type="AudioStream" uid="uid://5vkh0qfegmh" path="res://assets/sfx/weapons/AR15Rifle_shot.wav" id="6_8hlbx"]
 
 [sub_resource type="Animation" id="Animation_ne0yi"]
 length = 0.00999999999999999
@@ -239,6 +240,9 @@ region_rect = Rect2(0, 0, 10, 10)
 [node name="AnimationPlayer" parent="." index="1" unique_id=282601806]
 deterministic = true
 libraries/ = SubResource("AnimationLibrary_4joga")
+
+[node name="AudioStreamPlayer2D" parent="." index="2" unique_id=881796668]
+stream = ExtResource("6_8hlbx")
 
 [node name="Marker2D" parent="." index="3" unique_id=345704578]
 unique_name_in_owner = true

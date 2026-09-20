@@ -35,12 +35,14 @@ public partial class ReloadController : Node
 			ammoController.totalRounds -=roundsToFillMag;
 			ammoController.magazineRounds = ammoController.maxMagazineRounds;
 		}
-		else// if not enough reest ammo to fullfill magazine
+		else// if not enough reset ammo to fullfill magazine
 		{
 			ammoController.magazineRounds+=ammoController.totalRounds;
 			ammoController.totalRounds =0;
 		}
 		roundsToFillMag = 0;
+		// 换弹完成：弹匣数与备弹数都变了，同步更新 HUD 的弹药量
+		ammoController.BroadcastAmmo();
 		weapon.WeaponStatus = WeaponStatus.READY;
 	}
 	public void Cancel()
