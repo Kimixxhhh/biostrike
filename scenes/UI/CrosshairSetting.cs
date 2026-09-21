@@ -24,6 +24,9 @@ public partial class CrosshairSetting : Control
 	/// <summary>面板最小尺寸（内容更宽/更高时会被撑大）。</summary>
 	[Export] public Vector2 PanelMinSize { get; set; } = new Vector2(460f, 0f);
 
+	/// <summary>面板背景色（半透明）：Alpha 越小越能透出后面的画面。</summary>
+	[Export] public Color PanelBgColor { get; set; } = new Color(0.08f, 0.09f, 0.12f, 0.60f);
+
 	/// <summary>十字线长度滑条上限（像素）。</summary>
 	[Export] public float MaxArmLength { get; set; } = 64f;
 
@@ -92,10 +95,8 @@ public partial class CrosshairSetting : Control
 		panel.CustomMinimumSize = PanelMinSize;
 
 		var bgBox = new StyleBoxFlat();
-		bgBox.BgColor = new Color(0.08f, 0.09f, 0.12f, 0.94f);
-		bgBox.BorderColor = new Color(0.42f, 0.44f, 0.52f, 1f);
-		bgBox.SetBorderWidthAll(2);
-		bgBox.SetCornerRadiusAll(16);
+		bgBox.BgColor = PanelBgColor; // 半透明：透出后面的游戏画面
+		bgBox.SetCornerRadiusAll(16); // 圆角保留；不画描边（无边框）
 		bgBox.SetContentMarginAll(18);
 		panel.AddThemeStyleboxOverride("panel", bgBox);
 		AddChild(panel);

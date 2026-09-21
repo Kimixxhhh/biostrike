@@ -2,7 +2,8 @@ using Godot;
 
 /// <summary>
 /// 开始菜单（StartMenu）UI —— 顶部标签栏，从左到右：设置、开始、装备。
-/// 标签栏左右居中、上下靠上；选中效果 = 字体放大 20% + 字体变亮，不画背景框（见 TextTabContainer）。
+/// 标签栏左右居中、上下靠上；背景是半透明毛玻璃（模糊它后面的画面，见 MainTabBackdrop* 导出属性），
+/// 选中效果 = 字体放大 20% + 字体变亮，不画背景框（见 TextTabContainer）。
 /// 点击标签切换下方对应页面。"装备"页接入 LoadoutSetting.tscn；
 /// "设置"页顶部再套一层子标签栏：视频 / 音频 / 游戏 / 键盘/鼠标，
 /// 每个子标签下是可滚动的内容区（可用 GetSettingsPageContent(index) 取到内容容器往里加真实设置项）。
@@ -28,6 +29,15 @@ public partial class StartMenu : Control
 
 	/// <summary>装备页顶部内容留白（像素）。给一个小值，让配装面板贴近主标签栏。</summary>
 	[Export] public int LoadoutPageTopMargin { get; set; } = 6;
+
+	/// <summary>最上方主标签栏的背景是否用「毛玻璃」（半透明 + 模糊其后面的画面）。</summary>
+	[Export] public bool MainTabBackdropEnabled { get; set; } = true;
+
+	/// <summary>主标签栏毛玻璃的底色：Alpha = 透明度（0 = 全透明，1 = 不透明），RGB 叠在模糊画面上。</summary>
+	[Export] public Color MainTabBackdropTint { get; set; } = new Color(0.05f, 0.06f, 0.09f, 0.70f);
+
+	/// <summary>主标签栏毛玻璃的模糊半径（像素），越大越糊。</summary>
+	[Export] public float MainTabBackdropBlurRadius { get; set; } = 16f;
 
 	private TextTabContainer tabs;
 
@@ -74,6 +84,11 @@ public partial class StartMenu : Control
 		tabs.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
 		tabs.FontSize = MainTabFontSize;                 // 主标签字号比设置页子标签大
 		tabs.SelectedFontScale = SelectedTabFontScale;   // 选中项再放大 20%
+
+		// 顶部标签栏背景 = 毛玻璃（半透明 + 模糊它后面的画面）；设置页里的子标签栏保持全透明
+		tabs.BarBackdropEnabled = MainTabBackdropEnabled;
+		tabs.BarBackdropTint = MainTabBackdropTint;
+		tabs.BarBackdropBlurRadius = MainTabBackdropBlurRadius;
 		AddChild(tabs);
 
 		// 三个页面：第一个参数就是标签标题（添加顺序即从左到右顺序）

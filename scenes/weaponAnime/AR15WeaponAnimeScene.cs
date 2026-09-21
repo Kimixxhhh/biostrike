@@ -16,7 +16,7 @@ public partial class AR15WeaponAnimeScene : BasicWeaponAnime
 	public override void PlayAttack1Anime()
 	{
 		anime.Play("shoot");
-		musicPlayer.Play();
+		PlaySfx(GD.Load<AudioStream>("res://assets/sfx/weapons/AR15Rifle_shot.wav"),-7f);
 	}
 	public override void PlayAttack2Anime()
 	{
@@ -27,5 +27,12 @@ public partial class AR15WeaponAnimeScene : BasicWeaponAnime
 		anime.Play("RESET");
 		anime.Play("reload");
 	}
-	
+	public  void PlayRemoveMagSound()
+	{
+		PlaySfx(GD.Load<AudioStream>("res://assets/sfx/weapons/removemag.wav"),2f);
+	}
+	public  void PlayInsertMagSound()
+	{
+		PlaySfx(GD.Load<AudioStream>("res://assets/sfx/weapons/insertmag.wav"),2f);
+	}
 }
