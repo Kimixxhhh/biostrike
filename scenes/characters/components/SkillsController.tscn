@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://clic0y2u2pajj"]
+
+[ext_resource type="Script" uid="uid://b6kuf5vyvqkeu" path="res://scenes/characters/components/SkillsController.cs" id="1_he3fb"]
+
+[node name="SkillsController" type="Node" unique_id=2009389248]
+script = ExtResource("1_he3fb")

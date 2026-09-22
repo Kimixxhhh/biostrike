@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://1rsp4jxq2m31" path="res://scenes/characters/charaComponents/CharaAnimeSpetsnaz.tscn" id="2_sb4bh"]
 [ext_resource type="PackedScene" uid="uid://dipsm7myws7oq" path="res://scenes/characters/components/WeaponController.tscn" id="3_ql5qg"]
 [ext_resource type="PackedScene" uid="uid://cj5wtgslopkb2" path="res://scenes/characters/components/HealthComponent.tscn" id="4_hp"]
+[ext_resource type="PackedScene" uid="uid://cbumpq2wlg2mb" path="res://scenes/characters/components/CharaStats.tscn" id="5_1b0tw"]
+[ext_resource type="PackedScene" uid="uid://clic0y2u2pajj" path="res://scenes/characters/components/SkillsController.tscn" id="6_y14tx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
 radius = 20.0
@@ -25,3 +27,10 @@ frame_progress = 0.0
 position = Vector2(0, 6)
 
 [node name="HealthComponent" parent="." unique_id=1763624360 instance=ExtResource("4_hp")]
+unique_name_in_owner = true
+
+[node name="CharaStats" parent="." unique_id=487750345 instance=ExtResource("5_1b0tw")]
+unique_name_in_owner = true
+
+[node name="SkillsController" parent="." unique_id=2009389248 instance=ExtResource("6_y14tx")]
+unique_name_in_owner = true

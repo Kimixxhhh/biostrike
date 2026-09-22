@@ -15,6 +15,9 @@ public partial class CharacterBaseScene : CharacterBody2D
 	private float ResisRecoveryIndex = 80;
 	//divergence limit = 2 * physics fps, beyond this velocity explodes
 	private float maxResisIndex;
+
+	private CharaStats charaStats;
+	private SkillsController skillsController;
 	private WeaponController weaponController;
 	private HealthComponent healthComponent;
 	public HealthComponent HealthComponent
@@ -30,6 +33,9 @@ public partial class CharacterBaseScene : CharacterBody2D
 	{
 		weaponController = GetNode<WeaponController>("WeaponController");
 		healthComponent = GetNode<HealthComponent>("HealthComponent");
+		charaStats = GetNode<CharaStats>("CharaStats");
+		skillsController = GetNode<SkillsController>("SkillsController");
+		skillsController.Setup(charaStats);
 		actualResisIndex = resisIndex;
 		maxResisIndex = Engine.PhysicsTicksPerSecond*2f;
 	}
@@ -53,13 +59,13 @@ public partial class CharacterBaseScene : CharacterBody2D
 			//friction goes stronger when speed get faster
 			Velocity+= -Velocity*actualResisIndex*(float)delta;
 
-			Velocity+= direction*accIndex*(float)delta;
+			Velocity+= direction*charaStats.GetStat("AccIndex")*(float)delta;
 			return;
 		}
 		//friction goes stronger when speed get faster
 		Velocity+= -Velocity*actualResisIndex*(float)delta;
 
-		Velocity+= direction*accIndex*(float)delta*
+		Velocity+= direction*charaStats.GetStat("AccIndex")*(float)delta*
 		weaponController.EquippedWeapon[weaponController.WeaponSelectionIndex].WeaponData.MoveInertia;
 	}
 	public void TakeImpact(Vector2 velocity)

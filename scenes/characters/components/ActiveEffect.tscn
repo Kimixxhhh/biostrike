@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://13phkcvm3dnw"]
+
+[ext_resource type="Script" uid="uid://cwghy7vxygppg" path="res://scenes/characters/components/ActiveEffect.cs" id="1_j0fl8"]
+
+[node name="ActiveEffect" type="Node" unique_id=436865290]
+script = ExtResource("1_j0fl8")

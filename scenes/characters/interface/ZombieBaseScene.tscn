@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://qf610aio2lxi" path="res://scenes/characters/interface/CharacterBaseScene.cs" id="1_lxeqs"]
 [ext_resource type="PackedScene" uid="uid://dipsm7myws7oq" path="res://scenes/characters/components/WeaponController.tscn" id="3_rnoyb"]
 [ext_resource type="PackedScene" uid="uid://cj5wtgslopkb2" path="res://scenes/characters/components/HealthComponent.tscn" id="4_jdkw7"]
+[ext_resource type="PackedScene" uid="uid://cbumpq2wlg2mb" path="res://scenes/characters/components/CharaStats.tscn" id="5_wa33g"]
+[ext_resource type="PackedScene" uid="uid://clic0y2u2pajj" path="res://scenes/characters/components/SkillsController.tscn" id="6_45fxn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3owqy"]
 radius = 20.0
@@ -22,4 +24,10 @@ scale = Vector2(2.5, 2.5)
 [node name="WeaponController" parent="." unique_id=1089269761 instance=ExtResource("3_rnoyb")]
 
 [node name="HealthComponent" parent="." unique_id=1763624360 instance=ExtResource("4_jdkw7")]
+unique_name_in_owner = true
+
+[node name="CharaStats" parent="." unique_id=487750345 instance=ExtResource("5_wa33g")]
+unique_name_in_owner = true
+
+[node name="SkillsController" parent="." unique_id=2009389248 instance=ExtResource("6_45fxn")]
 unique_name_in_owner = true

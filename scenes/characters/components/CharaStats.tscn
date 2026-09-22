@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cbumpq2wlg2mb"]
+
+[ext_resource type="Script" uid="uid://8hj6u5g4lq7o" path="res://scenes/characters/components/CharaStats.cs" id="1_aswqk"]
+
+[node name="CharaStats" type="Node" unique_id=487750345]
+script = ExtResource("1_aswqk")
